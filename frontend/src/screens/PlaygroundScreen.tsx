@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useApp } from "@/context/AppContext";
 
@@ -35,14 +35,37 @@ const PRESET_QUERIES = ["catalogo", "productos", "soporte", "hardware", "contact
 export default function PlaygroundScreen() {
   const { account, documents, sites } = useApp();
 
-  const [query, setQuery] = useState("productos");
-  const [selectedSiteId, setSelectedSiteId] = useState<string>("all");
+  const [query, setQuery] = useState(() => {
+    if (typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search);
+      return sp.get("q") ?? "productos";
+    }
+    return "productos";
+  });
+  const [selectedSiteId, setSelectedSiteId] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search);
+      return sp.get("siteId") ?? "all";
+    }
+    return "all";
+  });
   const [useCustomKey, setUseCustomKey] = useState(false);
   const [customApiKey, setCustomApiKey] = useState(account.apiKey);
   const [activeTab, setActiveTab] = useState<"cards" | "json" | "headers">("cards");
   const [copiedJson, setCopiedJson] = useState(false);
   const [copiedCurl, setCopiedCurl] = useState(false);
   const [activeLang, setActiveLang] = useState<"curl" | "fetch" | "python">("curl");
+
+  // Synchronize browser's actual address bar with query parameters
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams();
+      if (query.trim()) params.set("q", query.trim());
+      if (selectedSiteId !== "all") params.set("siteId", selectedSiteId);
+      const newRelativePath = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+      window.history.replaceState(null, "", newRelativePath);
+    }
+  }, [query, selectedSiteId]);
 
   // Effective key being sent
   const currentKey = useCustomKey ? customApiKey : account.apiKey;
@@ -192,7 +215,7 @@ export default function PlaygroundScreen() {
             </div>
             <div className="flex items-center gap-3 text-xs">
               <span className="text-slate-400">Endpoint:</span>
-              <span className="font-mono text-emerald-400">http://localhost:3000/search</span>
+              <span className="font-mono text-emerald-400">http://localhost:3000/search{endpointQueryString}</span>
             </div>
           </div>
 
@@ -224,25 +247,30 @@ export default function PlaygroundScreen() {
             </div>
 
             {/* Input de URL con método GET */}
-            <div className="flex items-center gap-2 bg-slate-950 p-2 rounded-lg border border-slate-800">
-              <span className="px-3 py-1.5 rounded bg-emerald-500/20 text-emerald-400 text-xs font-bold font-mono shrink-0">
+            <div className="flex items-center gap-2 bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex-wrap sm:flex-nowrap">
+              <span className="px-2.5 py-1.5 rounded bg-emerald-500/20 text-emerald-400 text-xs font-bold font-mono shrink-0">
                 GET
               </span>
-              <span className="text-xs text-slate-500 font-mono shrink-0">
-                /search{endpointQueryString.split("=")[0] ? endpointQueryString.split("=")[0] + "=" : "?q="}
+              <span className="text-xs text-slate-400 font-mono shrink-0">
+                /search?q=
               </span>
               <input
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Ingresá palabras clave o keyphrase..."
-                className="flex-1 bg-transparent text-sm text-slate-100 font-mono focus:outline-none placeholder-slate-600"
+                placeholder="palabras-clave"
+                className="flex-1 min-w-[120px] bg-transparent text-sm text-slate-100 font-mono focus:outline-none placeholder-slate-600"
               />
+              {selectedSiteId !== "all" && (
+                <span className="text-xs font-mono px-2 py-1 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-800/80 shrink-0">
+                  &amp;siteId={selectedSiteId}
+                </span>
+              )}
               <button
                 type="button"
                 onClick={handleCopyCurl}
                 title="Copiar comando cURL equivalente"
-                className="px-3 py-1.5 text-xs rounded bg-slate-900 border border-slate-700 text-slate-300 hover:text-white transition-colors flex items-center gap-1.5 shrink-0"
+                className="px-3 py-1.5 text-xs rounded bg-slate-900 border border-slate-700 text-slate-300 hover:text-white transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer hover:bg-slate-800"
               >
                 {copiedCurl ? <IconCheck /> : <IconCopy />}
                 <span>{copiedCurl ? "Copiado" : "Copiar cURL"}</span>

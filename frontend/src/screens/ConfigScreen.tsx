@@ -15,100 +15,107 @@ export default function ConfigScreen() {
   const [guardado, setGuardado] = useState(false);
   const [showRegenerateConfirm, setShowRegenerateConfirm] = useState(false);
 
-  async function copiar() {
-    let success = false;
+  const copiar = () => {
+    // 1. Direct synchronous call to retain transient user gesture
+    if (typeof navigator !== "undefined" && navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard
+        .writeText(account.apiKey)
+        .then(() => {
+          setCopiado(true);
+          setTimeout(() => setCopiado(false), 2000);
+        })
+        .catch(() => {
+          execCopyFallback();
+        });
+      return;
+    }
+    execCopyFallback();
+  };
 
-    // 1. Primary fallback: directly select and copy via existing DOM input ref
-    if (keyInputRef.current) {
-      try {
-        keyInputRef.current.focus();
+  const execCopyFallback = () => {
+    try {
+      if (keyInputRef.current) {
         keyInputRef.current.select();
-        keyInputRef.current.setSelectionRange(0, account.apiKey.length);
-        success = document.execCommand("copy");
-      } catch {
-        // continue
+        keyInputRef.current.setSelectionRange(0, 99999);
       }
-    }
-
-    // 2. Also execute modern navigator.clipboard
-    if (typeof navigator !== "undefined" && navigator.clipboard && navigator.clipboard.writeText) {
-      try {
-        await navigator.clipboard.writeText(account.apiKey);
-        success = true;
-      } catch {
-        // continue
+      const ok = document.execCommand("copy");
+      if (keyInputRef.current) {
+        keyInputRef.current.blur();
       }
-    }
-
-    // 3. Fallback: temporary visible textarea without readonly attribute
-    if (!success) {
-      try {
-        const textarea = document.createElement("textarea");
-        textarea.value = account.apiKey;
-        textarea.style.position = "fixed";
-        textarea.style.top = "0";
-        textarea.style.left = "0";
-        textarea.style.width = "2em";
-        textarea.style.height = "2em";
-        textarea.style.padding = "0";
-        textarea.style.border = "none";
-        textarea.style.outline = "none";
-        textarea.style.boxShadow = "none";
-        textarea.style.background = "transparent";
-        textarea.style.opacity = "0.01";
-        textarea.style.zIndex = "99999";
-        document.body.appendChild(textarea);
-        textarea.focus();
-        textarea.select();
-        textarea.setSelectionRange(0, account.apiKey.length);
-        success = document.execCommand("copy");
-        document.body.removeChild(textarea);
-      } catch {
-        // continue
+      if (ok) {
+        setCopiado(true);
+        setTimeout(() => setCopiado(false), 2000);
+        return;
       }
+    } catch {
+      // ignore
     }
 
-    // Unfocus input to restore standard appearance
-    if (keyInputRef.current) {
-      keyInputRef.current.blur();
+    try {
+      const textarea = document.createElement("textarea");
+      textarea.value = account.apiKey;
+      textarea.style.position = "fixed";
+      textarea.style.top = "0";
+      textarea.style.left = "0";
+      textarea.style.width = "2em";
+      textarea.style.height = "2em";
+      textarea.style.padding = "0";
+      textarea.style.border = "none";
+      textarea.style.outline = "none";
+      textarea.style.boxShadow = "none";
+      textarea.style.background = "transparent";
+      textarea.style.opacity = "0.01";
+      textarea.style.zIndex = "99999";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      textarea.setSelectionRange(0, 99999);
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 2000);
+    } catch {
+      // fail
     }
+  };
 
-    setCopiado(true);
-    setTimeout(() => setCopiado(false), 2000);
-  }
-
-  async function copiarCurl() {
+  const copiarCurl = () => {
     const curlCmd = `curl -H "Authorization: ${account.apiKey}" "http://localhost:3000/search?q=palabra1+palabra2"`;
-    let success = false;
     if (typeof navigator !== "undefined" && navigator.clipboard && navigator.clipboard.writeText) {
-      try {
-        await navigator.clipboard.writeText(curlCmd);
-        success = true;
-      } catch {
-        // continue
-      }
+      navigator.clipboard
+        .writeText(curlCmd)
+        .then(() => {
+          setCopiadoCurl(true);
+          setTimeout(() => setCopiadoCurl(false), 2000);
+        })
+        .catch(() => {
+          execCurlFallback(curlCmd);
+        });
+      return;
     }
-    if (!success) {
-      try {
-        const textarea = document.createElement("textarea");
-        textarea.value = curlCmd;
-        textarea.style.position = "fixed";
-        textarea.style.top = "0";
-        textarea.style.left = "0";
-        textarea.style.opacity = "0.01";
-        textarea.style.zIndex = "99999";
-        document.body.appendChild(textarea);
-        textarea.focus();
-        textarea.select();
-        document.execCommand("copy");
-        document.body.removeChild(textarea);
-      } catch {
-        // continue
-      }
+    execCurlFallback(curlCmd);
+  };
+
+  const execCurlFallback = (text: string) => {
+    try {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.top = "0";
+      textarea.style.left = "0";
+      textarea.style.opacity = "0.01";
+      textarea.style.zIndex = "99999";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+      setCopiadoCurl(true);
+      setTimeout(() => setCopiadoCurl(false), 2000);
+    } catch {
+      // ignore
     }
-    setCopiadoCurl(true);
-    setTimeout(() => setCopiadoCurl(false), 2000);
-  }
+  };
 
   function handleGuardar(e: React.FormEvent) {
     e.preventDefault();
@@ -163,15 +170,19 @@ export default function ConfigScreen() {
               <button
                 type="button"
                 onClick={copiar}
-                className="px-4 py-2 text-xs font-bold rounded-lg transition-all inline-flex items-center gap-1.5 shadow-xs"
-                style={{ background: copiado ? "#2bc971" : "#3ddc84", color: "#0a1f14" }}
+                title="Copiar API Key al portapapeles"
+                className={`px-4 py-2 text-xs font-bold rounded-lg transition-all inline-flex items-center gap-1.5 shadow-xs cursor-pointer active:scale-95 ${
+                  copiado
+                    ? "bg-[#2bc971] text-[#0a1f14] ring-2 ring-[#2bc971]/40"
+                    : "bg-[#3ddc84] hover:bg-[#2bc971] text-[#0a1f14]"
+                }`}
               >
                 {copiado ? (
                   <>
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
                       <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
-                    Copiado!
+                    ¡Copiado!
                   </>
                 ) : (
                   <>
@@ -211,7 +222,7 @@ export default function ConfigScreen() {
                 <button
                   type="button"
                   onClick={copiarCurl}
-                  className="text-[11px] text-slate-300 hover:text-white transition-colors inline-flex items-center gap-1 font-mono"
+                  className="text-[11px] text-slate-300 hover:text-white transition-colors inline-flex items-center gap-1 font-mono cursor-pointer"
                 >
                   <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
                     <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="2"/>
