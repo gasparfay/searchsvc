@@ -1,15 +1,7 @@
 "use client";
 
-import type { Screen } from "@/types";
-
-const SITIOS = [
-  { id: "s-001", nombre: "Tienda Ejemplo",      url: "example.com",              estado: "activo",  ultimaCorrida: "Hace 2 horas",  docs: 1842, frecuencia: "Cada 6 horas" },
-  { id: "s-002", nombre: "Blog Corporativo",    url: "techblog.acme.io",         estado: "activo",  ultimaCorrida: "Hace 3 horas",  docs: 4391, frecuencia: "Cada 12 horas" },
-  { id: "s-005", nombre: "Wiki Interna",        url: "wiki.internal.acme.corp",  estado: "activo",  ultimaCorrida: "Hace 1 hora",   docs: 3104, frecuencia: "Cada 12 horas" },
-  { id: "s-003", nombre: "Documentación Dev",   url: "docs.product.dev",         estado: "pausado", ultimaCorrida: "Hace 1 día",    docs: 782,  frecuencia: "Cada 24 horas" },
-  { id: "s-004", nombre: "Repositorio Legal",   url: "legal.acme.corp",          estado: "error",   ultimaCorrida: "Hace 2 días",   docs: 229,  frecuencia: "Cada 48 horas" },
-  { id: "s-006", nombre: "Portal de Soporte",   url: "support.acme.corp",        estado: "activo",  ultimaCorrida: "Hace 30 min",   docs: 956,  frecuencia: "Cada 6 horas" },
-];
+import Link from "next/link";
+import { MOCK_SITES } from "@/data/mock-data";
 
 const ESTADO_CFG: Record<string, { label: string; dot: string; text: string; bg: string }> = {
   activo:  { label: "Activo",   dot: "#3ddc84", text: "#166534", bg: "#dcfce7" },
@@ -31,10 +23,10 @@ const IconSearch = () => (
   </svg>
 );
 
-export default function DashboardScreen({ onNavigate }: { onNavigate: (s: Screen) => void }) {
-  const activos = SITIOS.filter((s) => s.estado === "activo").length;
-  const totalDocs = SITIOS.reduce((a, s) => a + s.docs, 0);
-  const errores = SITIOS.filter((s) => s.estado === "error").length;
+export default function DashboardScreen() {
+  const activos = MOCK_SITES.filter((s) => s.status === "activo").length;
+  const totalDocs = MOCK_SITES.reduce((a, s) => a + s.docsCount, 0);
+  const errores = MOCK_SITES.filter((s) => s.status === "error").length;
 
   return (
     <div className="h-full overflow-y-auto" style={{ background: "#f0f2f6" }}>
@@ -48,23 +40,23 @@ export default function DashboardScreen({ onNavigate }: { onNavigate: (s: Screen
               Sitios Registrados
             </h1>
           </div>
-          <button
-            onClick={() => onNavigate("new-site")}
-            className="flex items-center gap-2 px-5 py-3 text-sm font-bold transition-all"
+          <Link
+            href="/sites/new"
+            className="flex items-center gap-2 px-5 py-3 text-sm font-bold transition-all rounded"
             style={{ background: "#3ddc84", color: "#0a1f14", letterSpacing: "0.04em" }}
             onMouseEnter={(e) => (e.currentTarget.style.background = "#2bc971")}
             onMouseLeave={(e) => (e.currentTarget.style.background = "#3ddc84")}
           >
             + Registrar Nuevo Sitio
-          </button>
+          </Link>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-4 mb-8">
           {[
-            { label: "Sitios activos",        valor: activos,                      color: "#166534",  bg: "#dcfce7", border: "#bbf7d0" },
-            { label: "Documentos indexados",  valor: totalDocs.toLocaleString("es"), color: "#1e3a6e",  bg: "#dbeafe", border: "#bfdbfe" },
-            { label: "Sitios con error",      valor: errores,                       color: "#991b1b",  bg: "#fee2e2", border: "#fecaca" },
+            { label: "Sitios activos",        valor: activos,                        color: "#166534", bg: "#dcfce7", border: "#bbf7d0" },
+            { label: "Documentos indexados",  valor: totalDocs.toLocaleString("es"), color: "#1e3a6e", bg: "#dbeafe", border: "#bfdbfe" },
+            { label: "Sitios con error",      valor: errores,                        color: "#991b1b", bg: "#fee2e2", border: "#fecaca" },
           ].map((s) => (
             <div key={s.label} className="px-6 py-5 rounded-lg" style={{ background: s.bg, border: `1px solid ${s.border}` }}>
               <div className="text-xs mb-2" style={{ color: s.color, opacity: 0.7, letterSpacing: "0.06em" }}>{s.label.toUpperCase()}</div>
@@ -73,54 +65,47 @@ export default function DashboardScreen({ onNavigate }: { onNavigate: (s: Screen
           ))}
         </div>
 
-        {/* Tabla */}
+        {/* Table */}
         <div className="rounded-lg overflow-hidden" style={{ background: "#ffffff", border: "1px solid #e2e8f0", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
-          {/* Tabla header */}
-          <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: "1px solid #f1f5f9" }}>
+          <div className="px-6 py-4 flex items-center justify-between" style={{ borderBottom: "1px solid #f1f5f9" }}>
             <div className="text-xs font-bold" style={{ color: "#0f172a", letterSpacing: "0.06em" }}>
-              {SITIOS.length} SITIOS REGISTRADOS
+              LISTADO DE SITIOS ({MOCK_SITES.length})
             </div>
-            <div className="flex items-center gap-2">
-              <div className="flex items-center rounded px-3 py-1.5 gap-2" style={{ background: "#f8fafc", border: "1px solid #e2e8f0" }}>
-                <IconSearch />
-                <input
-                  placeholder="Buscar sitio..."
-                  className="bg-transparent text-xs focus:outline-none w-36"
-                  style={{ color: "#64748b" }}
-                />
-              </div>
+            <div className="text-xs" style={{ color: "#94a3b8" }}>
+              MongoDB Collection: sites
             </div>
           </div>
-
           <table className="w-full">
             <thead>
               <tr style={{ borderBottom: "1px solid #f1f5f9", background: "#fafbfc" }}>
-                {["Sitio", "URL", "Frecuencia", "Última corrida", "Documentos", "Estado", "Acciones"].map((h) => (
-                  <th key={h} className="text-left px-6 py-3 text-xs font-medium" style={{ color: "#94a3b8", letterSpacing: "0.06em" }}>
+                {["Sitio / ID", "URL Base", "Frecuencia", "Última corrida", "Docs", "Estado", "Acciones"].map((h) => (
+                  <th key={h} className="text-left px-6 py-3.5 text-xs font-medium" style={{ color: "#94a3b8", letterSpacing: "0.06em" }}>
                     {h.toUpperCase()}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {SITIOS.map((s, i) => {
-                const ec = ESTADO_CFG[s.estado];
+              {MOCK_SITES.map((s, i) => {
+                const ec = ESTADO_CFG[s.status];
                 return (
                   <tr
-                    key={s.id}
-                    style={{ borderBottom: i < SITIOS.length - 1 ? "1px solid #f8fafc" : "none" }}
+                    key={s._id}
+                    style={{ borderBottom: i < MOCK_SITES.length - 1 ? "1px solid #f8fafc" : "none" }}
                     onMouseEnter={(e) => (e.currentTarget.style.background = "#fafbfd")}
                     onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                   >
                     <td className="px-6 py-4">
-                      <div className="text-sm font-semibold" style={{ color: "#0f172a" }}>{s.nombre}</div>
-                      <div className="text-xs mt-0.5" style={{ color: "#94a3b8" }}>{s.id}</div>
+                      <Link href={`/sites/${s._id}`} className="text-sm font-semibold hover:underline block" style={{ color: "#0f172a" }}>
+                        {s.name}
+                      </Link>
+                      <div className="text-xs mt-0.5 font-mono" style={{ color: "#94a3b8" }}>{s._id}</div>
                     </td>
-                    <td className="px-6 py-4 text-xs" style={{ color: "#475569" }}>{s.url}</td>
-                    <td className="px-6 py-4 text-xs" style={{ color: "#64748b" }}>{s.frecuencia}</td>
-                    <td className="px-6 py-4 text-xs" style={{ color: "#64748b" }}>{s.ultimaCorrida}</td>
+                    <td className="px-6 py-4 text-xs font-mono" style={{ color: "#475569" }}>{s.url}</td>
+                    <td className="px-6 py-4 text-xs" style={{ color: "#64748b" }}>{s.frequency}</td>
+                    <td className="px-6 py-4 text-xs" style={{ color: "#64748b" }}>{s.lastRun}</td>
                     <td className="px-6 py-4 text-sm font-semibold" style={{ color: "#0f172a" }}>
-                      {s.docs.toLocaleString("es")}
+                      {s.docsCount.toLocaleString("es")}
                     </td>
                     <td className="px-6 py-4">
                       <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full"
@@ -131,25 +116,22 @@ export default function DashboardScreen({ onNavigate }: { onNavigate: (s: Screen
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <button
+                        <Link
+                          href="/config"
                           title="Configuración"
-                          className="p-2.5 rounded transition-all"
+                          className="p-2.5 rounded transition-all inline-flex items-center justify-center"
                           style={{ color: "#94a3b8", background: "#f1f5f9" }}
-                          onMouseEnter={(e) => { e.currentTarget.style.background = "#e2e8f0"; e.currentTarget.style.color = "#475569"; }}
-                          onMouseLeave={(e) => { e.currentTarget.style.background = "#f1f5f9"; e.currentTarget.style.color = "#94a3b8"; }}
                         >
                           <IconGear />
-                        </button>
-                        <button
+                        </Link>
+                        <Link
+                          href={`/sites/${s._id}`}
                           title="Ver documentos"
-                          onClick={() => onNavigate({ type: "detail", siteId: s.id })}
-                          className="p-2.5 rounded transition-all"
+                          className="p-2.5 rounded transition-all inline-flex items-center justify-center"
                           style={{ color: "#3ddc84", background: "rgba(61,220,132,0.1)" }}
-                          onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(61,220,132,0.2)"; }}
-                          onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(61,220,132,0.1)"; }}
                         >
                           <IconSearch />
-                        </button>
+                        </Link>
                       </div>
                     </td>
                   </tr>

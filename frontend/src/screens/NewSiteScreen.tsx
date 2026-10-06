@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import type { Screen } from "@/types";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const CODE_EXTRACTOR = `function extract(request, response) {
   const $ = response.body;
@@ -32,13 +33,22 @@ const CODE_RESOLVER = `function pageResolver(request, response) {
   return links;
 }`;
 
-export default function NewSiteScreen({ onNavigate }: { onNavigate: (s: Screen) => void }) {
+export default function NewSiteScreen() {
+  const router = useRouter();
   const [form, setForm] = useState({
     nombre: "",
     url: "",
-    profundidad: "2",
-    frecuencia: "Cada 24 horas",
+    profundidad: 2,
+    frecuencia: "daily",
   });
+  const [extractorSnippet, setExtractorSnippet] = useState(CODE_EXTRACTOR);
+  const [pageResolverSnippet, setPageResolverSnippet] = useState(CODE_RESOLVER);
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    // En una siguiente etapa esto ejecutará POST /sites al backend de NestJS
+    router.push("/sites");
+  }
 
   return (
     <div className="h-full overflow-y-auto" style={{ background: "#f0f2f6" }}>
@@ -54,118 +64,126 @@ export default function NewSiteScreen({ onNavigate }: { onNavigate: (s: Screen) 
               Registrar Nuevo Sitio
             </h1>
           </div>
-          <button
-            onClick={() => onNavigate("dashboard")}
+          <Link
+            href="/sites"
             className="text-xs transition-colors"
             style={{ color: "#94a3b8" }}
             onMouseEnter={(e) => (e.currentTarget.style.color = "#475569")}
             onMouseLeave={(e) => (e.currentTarget.style.color = "#94a3b8")}
           >
             ← Cancelar
-          </button>
+          </Link>
         </div>
 
         {/* Card formulario */}
-        <div className="rounded-xl" style={{ background: "#ffffff", border: "1px solid #e2e8f0", boxShadow: "0 4px 16px rgba(0,0,0,0.06)" }}>
+        <form onSubmit={handleSubmit} className="rounded-xl" style={{ background: "#ffffff", border: "1px solid #e2e8f0", boxShadow: "0 4px 16px rgba(0,0,0,0.06)" }}>
 
-          {/* Sección 1: Datos básicos */}
-          <div className="px-8 pt-8 pb-6" style={{ borderBottom: "1px solid #f1f5f9" }}>
-            <div className="text-xs font-bold mb-5" style={{ color: "#3ddc84", letterSpacing: "0.1em" }}>
-              01 / INFORMACIÓN BÁSICA
+          {/* Sección 1: Parámetros del sitio */}
+          <div className="p-8" style={{ borderBottom: "1px solid #f1f5f9" }}>
+            <div className="text-xs font-bold mb-1" style={{ color: "#0f172a", letterSpacing: "0.06em" }}>
+              PARÁMETROS DEL SITIO
             </div>
-            <div className="grid grid-cols-2 gap-5">
+            <div className="text-xs mb-6" style={{ color: "#94a3b8" }}>
+              Definí el sitio a inspeccionar y los límites de profundidad para el crawler.
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
               <div>
-                <label className="block text-xs font-medium mb-2" style={{ color: "#475569", letterSpacing: "0.04em" }}>
-                  NOMBRE DEL SITIO
+                <label className="block text-xs font-medium mb-2" style={{ color: "#475569" }}>
+                  NOMBRE DEL SITIO *
                 </label>
                 <input
+                  type="text"
+                  required
                   value={form.nombre}
                   onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-                  placeholder="Tienda Ejemplo"
-                  className="w-full px-4 py-3 text-sm focus:outline-none rounded-lg"
+                  placeholder="Ej: Tienda Oficial"
+                  className="w-full px-4 py-3 text-sm rounded-lg focus:outline-none transition-colors"
                   style={{ background: "#f8fafc", border: "1px solid #e2e8f0", color: "#0f172a" }}
                   onFocus={(e) => (e.target.style.borderColor = "#3ddc84")}
                   onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
                 />
               </div>
+
               <div>
-                <label className="block text-xs font-medium mb-2" style={{ color: "#475569", letterSpacing: "0.04em" }}>
-                  URL A CRAWLEAR
+                <label className="block text-xs font-medium mb-2" style={{ color: "#475569" }}>
+                  URL DEL SITIO (HOME) *
                 </label>
                 <input
+                  type="url"
+                  required
                   value={form.url}
                   onChange={(e) => setForm({ ...form, url: e.target.value })}
                   placeholder="https://example.com"
-                  className="w-full px-4 py-3 text-sm focus:outline-none rounded-lg"
+                  className="w-full px-4 py-3 text-sm rounded-lg focus:outline-none transition-colors font-mono"
                   style={{ background: "#f8fafc", border: "1px solid #e2e8f0", color: "#0f172a" }}
                   onFocus={(e) => (e.target.style.borderColor = "#3ddc84")}
                   onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
                 />
               </div>
-            </div>
-          </div>
 
-          {/* Sección 2: Configuración crawl */}
-          <div className="px-8 py-6" style={{ borderBottom: "1px solid #f1f5f9" }}>
-            <div className="text-xs font-bold mb-5" style={{ color: "#3ddc84", letterSpacing: "0.1em" }}>
-              02 / PARÁMETROS DE CRAWLING
-            </div>
-            <div className="grid grid-cols-2 gap-5">
               <div>
-                <label className="block text-xs font-medium mb-2" style={{ color: "#475569", letterSpacing: "0.04em" }}>
-                  NIVELES DE PROFUNDIDAD
+                <label className="block text-xs font-medium mb-2" style={{ color: "#475569" }}>
+                  NIVELES DE HOJAS (PROFUNDIDAD MAXDEPTH) *
                 </label>
-                <div className="flex items-center gap-3">
-                  <input
-                    type="number"
-                    value={form.profundidad}
-                    onChange={(e) => setForm({ ...form, profundidad: e.target.value })}
-                    min="1" max="10"
-                    className="w-24 px-4 py-3 text-sm focus:outline-none rounded-lg text-center"
-                    style={{ background: "#f8fafc", border: "1px solid #e2e8f0", color: "#0f172a" }}
-                    onFocus={(e) => (e.target.style.borderColor = "#3ddc84")}
-                    onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
-                  />
-                  <span className="text-xs" style={{ color: "#94a3b8" }}>
-                    Nivel {form.profundidad} = se visitarán páginas a {form.profundidad} clics de profundidad.
-                  </span>
+                <select
+                  value={form.profundidad}
+                  onChange={(e) => setForm({ ...form, profundidad: Number(e.target.value) })}
+                  className="w-full px-4 py-3 text-sm rounded-lg focus:outline-none transition-colors"
+                  style={{ background: "#f8fafc", border: "1px solid #e2e8f0", color: "#0f172a" }}
+                >
+                  <option value={1}>1 nivel — Solo Home</option>
+                  <option value={2}>2 niveles — Home + enlaces directos (por defecto)</option>
+                  <option value={3}>3 niveles — Home + enlaces + subpáginas</option>
+                  <option value={4}>4 niveles — Exploración profunda</option>
+                </select>
+                <div className="text-xs mt-1.5" style={{ color: "#94a3b8" }}>
+                  Límite de tags &lt;a&gt; anidados a seguir por el job del crawler.
                 </div>
               </div>
+
               <div>
-                <label className="block text-xs font-medium mb-2" style={{ color: "#475569", letterSpacing: "0.04em" }}>
-                  FRECUENCIA DE CRAWL
+                <label className="block text-xs font-medium mb-2" style={{ color: "#475569" }}>
+                  FRECUENCIA DE VISITA *
                 </label>
                 <select
                   value={form.frecuencia}
                   onChange={(e) => setForm({ ...form, frecuencia: e.target.value })}
-                  className="w-full px-4 py-3 text-sm focus:outline-none rounded-lg"
+                  className="w-full px-4 py-3 text-sm rounded-lg focus:outline-none transition-colors"
                   style={{ background: "#f8fafc", border: "1px solid #e2e8f0", color: "#0f172a" }}
                 >
-                  {["Cada 1 hora", "Cada 6 horas", "Cada 12 horas", "Cada 24 horas", "Cada 48 horas", "Cada 7 días"].map((v) => (
-                    <option key={v}>{v}</option>
-                  ))}
+                  <option value="hourly">Cada 1 hora</option>
+                  <option value="6h">Cada 6 horas</option>
+                  <option value="12h">Cada 12 horas</option>
+                  <option value="daily">Diaria (Cada 24 horas - por defecto)</option>
+                  <option value="weekly">Semanal</option>
                 </select>
+                <div className="text-xs mt-1.5" style={{ color: "#94a3b8" }}>
+                  Intervalo en el que el scheduler ejecutará el job de extracción.
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Sección 3: Code editors */}
-          <div className="px-8 py-6" style={{ borderBottom: "1px solid #f1f5f9" }}>
-            <div className="text-xs font-bold mb-5" style={{ color: "#3ddc84", letterSpacing: "0.1em" }}>
-              03 / EXTRACTORES DE DATOS
+          {/* Sección 2: Snippets de JavaScript */}
+          <div className="p-8" style={{ borderBottom: "1px solid #f1f5f9" }}>
+            <div className="text-xs font-bold mb-1" style={{ color: "#0f172a", letterSpacing: "0.06em" }}>
+              SNIPPETS JAVASCRIPT (CHEERIO)
             </div>
-            <div className="grid grid-cols-2 gap-5">
+            <div className="text-xs mb-6" style={{ color: "#94a3b8" }}>
+              Código JavaScript ejecutado en el backend con Cheerio para parsear el contenido HTML.
+            </div>
 
-              {/* Document extractor */}
+            <div className="grid grid-cols-2 gap-6">
+              {/* Document Extractor */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs font-medium" style={{ color: "#475569", letterSpacing: "0.04em" }}>
-                    DOCUMENT EXTRACTOR <span style={{ color: "#3ddc84" }}>(JavaScript)</span>
+                  <label className="text-xs font-medium" style={{ color: "#475569" }}>
+                    DOCUMENT EXTRACTOR *
                   </label>
-                  <span className="text-xs" style={{ color: "#94a3b8" }}>Requerido</span>
+                  <span className="text-xs font-medium" style={{ color: "#3ddc84" }}>Requerido</span>
                 </div>
                 <div className="rounded-lg overflow-hidden" style={{ border: "1px solid #1e2d42" }}>
-                  {/* Editor top bar */}
                   <div className="flex items-center gap-2 px-4 py-2" style={{ background: "#162032" }}>
                     <div className="w-2.5 h-2.5 rounded-full" style={{ background: "#f87171" }} />
                     <div className="w-2.5 h-2.5 rounded-full" style={{ background: "#fbbf24" }} />
@@ -173,7 +191,8 @@ export default function NewSiteScreen({ onNavigate }: { onNavigate: (s: Screen) 
                     <span className="text-xs ml-2" style={{ color: "#3a5570" }}>extractor.js</span>
                   </div>
                   <textarea
-                    defaultValue={CODE_EXTRACTOR}
+                    value={extractorSnippet}
+                    onChange={(e) => setExtractorSnippet(e.target.value)}
                     rows={12}
                     className="w-full px-4 py-4 text-xs focus:outline-none resize-none leading-relaxed"
                     style={{ background: "#0e1525", color: "#a0bcd8", fontFamily: "JetBrains Mono, monospace" }}
@@ -182,11 +201,11 @@ export default function NewSiteScreen({ onNavigate }: { onNavigate: (s: Screen) 
                 </div>
               </div>
 
-              {/* Page resolver */}
+              {/* Page Resolver */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs font-medium" style={{ color: "#475569", letterSpacing: "0.04em" }}>
-                    PAGE RESOLVER <span style={{ color: "#94a3b8" }}>(Opcional)</span>
+                  <label className="text-xs font-medium" style={{ color: "#475569" }}>
+                    PAGE RESOLVER
                   </label>
                   <span className="text-xs" style={{ color: "#94a3b8" }}>Opcional</span>
                 </div>
@@ -198,7 +217,8 @@ export default function NewSiteScreen({ onNavigate }: { onNavigate: (s: Screen) 
                     <span className="text-xs ml-2" style={{ color: "#3a5570" }}>resolver.js</span>
                   </div>
                   <textarea
-                    defaultValue={CODE_RESOLVER}
+                    value={pageResolverSnippet}
+                    onChange={(e) => setPageResolverSnippet(e.target.value)}
                     rows={12}
                     className="w-full px-4 py-4 text-xs focus:outline-none resize-none leading-relaxed"
                     style={{ background: "#0e1525", color: "#a0bcd8", fontFamily: "JetBrains Mono, monospace" }}
@@ -211,17 +231,17 @@ export default function NewSiteScreen({ onNavigate }: { onNavigate: (s: Screen) 
 
           {/* Acciones */}
           <div className="flex items-center justify-between px-8 py-5">
-            <button
-              onClick={() => onNavigate("dashboard")}
+            <Link
+              href="/sites"
               className="text-sm transition-colors"
               style={{ color: "#94a3b8" }}
               onMouseEnter={(e) => (e.currentTarget.style.color = "#475569")}
               onMouseLeave={(e) => (e.currentTarget.style.color = "#94a3b8")}
             >
               Cancelar
-            </button>
+            </Link>
             <button
-              onClick={() => onNavigate("dashboard")}
+              type="submit"
               className="px-6 py-3 text-sm font-bold rounded-lg transition-all"
               style={{ background: "#3ddc84", color: "#0a1f14", letterSpacing: "0.04em" }}
               onMouseEnter={(e) => (e.currentTarget.style.background = "#2bc971")}
@@ -230,7 +250,7 @@ export default function NewSiteScreen({ onNavigate }: { onNavigate: (s: Screen) 
               Guardar Configuración →
             </button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );

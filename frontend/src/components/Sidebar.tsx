@@ -1,6 +1,8 @@
 "use client";
 
-import type { Screen } from "@/types";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { MOCK_ACCOUNT } from "@/data/mock-data";
 
 const IconSites = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -28,15 +30,14 @@ const IconConfig = () => (
 );
 
 const NAV = [
-  { id: "dashboard", label: "Mis Sitios",    Icon: IconSites   },
-  { id: "monitor",   label: "Monitoreo",     Icon: IconMonitor },
-  { id: "config",    label: "Configuración", Icon: IconConfig  },
+  { href: "/sites", label: "Mis Sitios",    Icon: IconSites   },
+  { href: "/monitor", label: "Monitoreo",   Icon: IconMonitor },
+  { href: "/config",  label: "Configuración", Icon: IconConfig  },
 ] as const;
 
-export default function Sidebar({ current, onNavigate }: {
-  current: string;
-  onNavigate: (s: Screen) => void;
-}) {
+export default function Sidebar() {
+  const pathname = usePathname();
+
   return (
     <aside className="flex flex-col h-full shrink-0" style={{
       width: 270,
@@ -45,7 +46,7 @@ export default function Sidebar({ current, onNavigate }: {
     }}>
       {/* Logo */}
       <div className="px-6 pt-7 pb-6" style={{ borderBottom: "1px solid #1e2d42" }}>
-        <div className="flex items-center gap-3 mb-2">
+        <Link href="/sites" className="flex items-center gap-3 mb-2 group">
           <div className="w-9 h-9 flex items-center justify-center shrink-0" style={{
             background: "#3ddc84",
             clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
@@ -56,7 +57,7 @@ export default function Sidebar({ current, onNavigate }: {
             </svg>
           </div>
           <span className="text-base font-bold tracking-wider" style={{ color: "#e2e8f4" }}>SEARCHSVC</span>
-        </div>
+        </Link>
         <div className="text-xs" style={{ color: "#3ddc84", letterSpacing: "0.06em" }}>
           ● SISTEMA ACTIVO
         </div>
@@ -64,28 +65,32 @@ export default function Sidebar({ current, onNavigate }: {
 
       {/* Nav */}
       <nav className="flex-1 px-3 pt-4 flex flex-col gap-1 overflow-y-auto">
-        {NAV.map(({ id, label, Icon }) => {
-          const active = current === id;
+        {NAV.map(({ href, label, Icon }) => {
+          const isActive =
+            href === "/sites"
+              ? pathname === "/" || pathname.startsWith("/sites")
+              : pathname.startsWith(href);
+
           return (
-            <button
-              key={id}
-              onClick={() => onNavigate(id as Screen)}
+            <Link
+              key={href}
+              href={href}
               className="flex items-center gap-3.5 px-4 py-3 rounded text-sm text-left w-full transition-all"
               style={{
-                background:    active ? "rgba(61,220,132,0.12)" : "transparent",
-                color:         active ? "#3ddc84" : "#5a7a9a",
-                borderLeft:    active ? "3px solid #3ddc84" : "3px solid transparent",
+                background:    isActive ? "rgba(61,220,132,0.12)" : "transparent",
+                color:         isActive ? "#3ddc84" : "#5a7a9a",
+                borderLeft:    isActive ? "3px solid #3ddc84" : "3px solid transparent",
                 letterSpacing: "0.03em",
-                fontWeight:    active ? 600 : 400,
+                fontWeight:    isActive ? 600 : 400,
               }}
-              onMouseEnter={(e) => { if (!active) { e.currentTarget.style.color = "#a0bcd8"; e.currentTarget.style.background = "rgba(255,255,255,0.04)"; } }}
-              onMouseLeave={(e) => { if (!active) { e.currentTarget.style.color = "#5a7a9a"; e.currentTarget.style.background = "transparent"; } }}
+              onMouseEnter={(e) => { if (!isActive) { e.currentTarget.style.color = "#a0bcd8"; e.currentTarget.style.background = "rgba(255,255,255,0.04)"; } }}
+              onMouseLeave={(e) => { if (!isActive) { e.currentTarget.style.color = "#5a7a9a"; e.currentTarget.style.background = "transparent"; } }}
             >
               <span style={{ width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 <Icon />
               </span>
               {label}
-            </button>
+            </Link>
           );
         })}
       </nav>
@@ -95,11 +100,11 @@ export default function Sidebar({ current, onNavigate }: {
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded flex items-center justify-center text-xs font-bold shrink-0"
             style={{ background: "rgba(61,220,132,0.15)", color: "#3ddc84", border: "1px solid rgba(61,220,132,0.25)" }}>
-            JS
+            {MOCK_ACCOUNT.name.split(" ").map(n => n[0]).join("")}
           </div>
           <div className="min-w-0">
-            <div className="text-sm font-medium truncate" style={{ color: "#c8d8ec" }}>jason.sweet</div>
-            <div className="text-xs truncate" style={{ color: "#3a5570" }}>@acme.corp</div>
+            <div className="text-sm font-medium truncate" style={{ color: "#c8d8ec" }}>{MOCK_ACCOUNT.name}</div>
+            <div className="text-xs truncate" style={{ color: "#3a5570" }}>{MOCK_ACCOUNT.email}</div>
           </div>
         </div>
       </div>
