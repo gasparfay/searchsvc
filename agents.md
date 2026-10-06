@@ -21,7 +21,7 @@ El objetivo es construir una solución basada en **microservicios** para:
   > ⚠️ **Regla ESM crítica:** Todos los imports relativos en TypeScript **deben incluir la extensión `.js`** (ej: `import { Site } from './site.js';`).
 * **Framework:** NestJS 12.
 * **Base de Datos:** MongoDB conectada mediante `@nestjs/mongoose` y `mongoose` 9+.
-* **Validación de Entrada:** `class-validator` y `class-transformer` con `ValidationPipe` global en `src/main.ts` (`whitelist: true`, `transform: true`).
+* **Validación de Entrada:** `class-validator` y `class-transformer` con `ValidationPipe` global en `backend/src/main.ts` (`whitelist: true`, `transform: true`).
 * **Documentación de API:** Swagger / OpenAPI en la ruta `/api`.
 * **Herramientas de Calidad:**
   * Linter: **Oxlint** (`npm run lint`).
@@ -34,7 +34,7 @@ El objetivo es construir una solución basada en **microservicios** para:
 Actualmente se encuentran implementadas dos entidades principales bajo una relación **One-to-Many / hasMany** (`Account` 1 ➔ N `Site`):
 
 ### A. `Account` (Cuenta / Usuario titular)
-* **Ubicación:** [`src/accounts/`](file:///home/gasparfay/Projects/IAW/searchsvc/src/accounts)
+* **Ubicación:** [`backend/src/accounts/`](file:///home/gasparfay/Projects/IAW/searchsvc/backend/src/accounts)
 * **Propósito:** Representa a la persona u organización que posee sitios y realiza búsquedas.
 * **Atributos:**
   * `_id`: ObjectId de MongoDB.
@@ -55,7 +55,7 @@ Actualmente se encuentran implementadas dos entidades principales bajo una relac
 ---
 
 ### B. `Site` (Sitio web a crawlear)
-* **Ubicación:** [`src/sites/`](file:///home/gasparfay/Projects/IAW/searchsvc/src/sites)
+* **Ubicación:** [`backend/src/sites/`](file:///home/gasparfay/Projects/IAW/searchsvc/backend/src/sites)
 * **Propósito:** Configura los parámetros de visita e inspección de un sitio específico.
 * **Atributos:**
   * `_id`: ObjectId de MongoDB.
@@ -127,16 +127,17 @@ Según **`Search service.pdf`**, para completar el sistema se requerirán las si
 
 ```text
 searchsvc/
-├── .env                              # Variables de entorno activas (MONGODB_URI)
-├── package.json                      # Dependencias y scripts del proyecto
-├── nest-cli.json                     # Configuración del CLI de NestJS
-├── tsconfig.json                     # TypeScript config (nodenext)
-├── Search Service.pdf                # Enunciado original completo
-├── agents.md                         # Este documento de contexto
-│
-└── src/
-    ├── main.ts                       # Bootstrap de NestJS con ValidationPipe global
-    ├── app.module.ts                 # Módulo raíz (conecta MongooseModule.forRootAsync y submódulos)
+├── backend/
+│   ├── .env                              # Variables de entorno activas (MONGODB_URI)
+│   ├── package.json                      # Dependencias y scripts del backend
+│   ├── nest-cli.json                     # Configuración del CLI de NestJS
+│   ├── tsconfig.json                     # TypeScript config (nodenext)
+│   └── src/
+│       ├── main.ts                       # Bootstrap de NestJS con ValidationPipe global
+│       ├── app.module.ts                 # Módulo raíz (conecta MongooseModule.forRootAsync y submódulos)
+├── frontend/                             # Aplicación web Next.js
+├── Search Service.pdf                    # Enunciado original completo
+└── agents.md                             # Este documento de contexto
     ├── app.controller.ts             # Health check básico
     ├── app.service.ts                # Servicio base
     │
