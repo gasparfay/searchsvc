@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useApp } from "@/context/AppContext";
 import PageHeader from "@/components/PageHeader";
 import StatCard from "@/components/StatCard";
+import { Button } from "@/components/ui/button";
 import SiteTable from "@/components/SiteTable";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
 
@@ -46,11 +47,8 @@ export default function SitesPage() {
           breadcrumb="MIS SITIOS / RESUMEN"
           title="Sitios Registrados"
           action={
-            <Link
-              href="/sites/new"
-              className="flex items-center gap-2 px-5 py-3 text-sm font-bold rounded bg-[#3ddc84] hover:bg-[#2bc971] text-[#0a1f14] transition-all cursor-pointer shadow-xs"
-            >
-              + Registrar Nuevo Sitio
+            <Link href="/sites/new">
+              <Button size="lg">+ Registrar Nuevo Sitio</Button>
             </Link>
           }
         />

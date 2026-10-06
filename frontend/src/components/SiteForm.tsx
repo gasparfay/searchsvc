@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import CodeEditor from "@/components/CodeEditor";
+import { Button } from "@/components/ui/button";
 
 const DEFAULT_EXTRACTOR = `function extract(request, response) {
   const $ = response.body;
@@ -170,55 +172,23 @@ export function SiteForm({
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Document Extractor */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-medium text-slate-600">
-                DOCUMENT EXTRACTOR *
-              </label>
-              <span className="text-xs font-semibold text-emerald-600">Requerido</span>
-            </div>
-            <div className="rounded-lg overflow-hidden border border-slate-800 bg-[#0e1525]">
-              <div className="flex items-center gap-2 px-4 py-2 bg-[#162032] border-b border-slate-800">
-                <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
-                <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-                <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-                <span className="text-xs ml-2 font-mono text-slate-400">extractor.js</span>
-              </div>
-              <textarea
-                value={extractorSnippet}
-                onChange={(e) => setExtractorSnippet(e.target.value)}
-                rows={12}
-                className="w-full px-4 py-4 text-xs font-mono leading-relaxed bg-[#0e1525] text-slate-200 focus:outline-none resize-none"
-                spellCheck={false}
-              />
-            </div>
-          </div>
+          <CodeEditor
+            label="Document Extractor *"
+            badge="Requerido"
+            badgeVariant="required"
+            filename="extractor.js"
+            value={extractorSnippet}
+            onChange={setExtractorSnippet}
+          />
 
-          {/* Page Resolver */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-medium text-slate-600">
-                PAGE RESOLVER
-              </label>
-              <span className="text-xs text-slate-400">Opcional</span>
-            </div>
-            <div className="rounded-lg overflow-hidden border border-slate-800 bg-[#0e1525]">
-              <div className="flex items-center gap-2 px-4 py-2 bg-[#162032] border-b border-slate-800">
-                <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
-                <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-                <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-                <span className="text-xs ml-2 font-mono text-slate-400">resolver.js</span>
-              </div>
-              <textarea
-                value={pageResolverSnippet}
-                onChange={(e) => setPageResolverSnippet(e.target.value)}
-                rows={12}
-                className="w-full px-4 py-4 text-xs font-mono leading-relaxed bg-[#0e1525] text-slate-200 focus:outline-none resize-none"
-                spellCheck={false}
-              />
-            </div>
-          </div>
+          <CodeEditor
+            label="Page Resolver"
+            badge="Opcional"
+            badgeVariant="optional"
+            filename="resolver.js"
+            value={pageResolverSnippet}
+            onChange={setPageResolverSnippet}
+          />
         </div>
       </div>
 
@@ -230,12 +200,9 @@ export function SiteForm({
         >
           Cancelar
         </Link>
-        <button
-          type="submit"
-          className="px-6 py-3 text-sm font-bold rounded-lg bg-[#3ddc84] hover:bg-[#2bc971] active:scale-95 text-[#0a1f14] transition-all cursor-pointer shadow-sm"
-        >
+        <Button type="submit" size="lg">
           {submitLabel}
-        </button>
+        </Button>
       </div>
     </form>
   );

@@ -9,10 +9,12 @@ import {
   IconEdit,
   IconTrash,
 } from "@/components/icons";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import SnapshotBar from "@/components/SnapshotBar";
 import DocumentCard from "@/components/DocumentCard";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
-import StatusBadge from "@/components/StatusBadge";
 import EmptyState from "@/components/EmptyState";
 import SearchInput from "@/components/SearchInput";
 
@@ -90,16 +92,16 @@ export default function SiteDetailPage({
           <div>
             <Link
               href="/sites"
-              className="text-xs mb-2 inline-flex items-center gap-1.5 transition-colors text-slate-400 hover:text-slate-700"
+              className="text-xs mb-2 inline-flex items-center gap-1.5 transition-colors text-slate-400 hover:text-slate-700 font-medium"
             >
               <IconArrowLeft />
               Volver a Mis Sitios
             </Link>
             <div className="flex items-center gap-3">
               <h1 className="text-2xl font-bold text-slate-900">{site.name}</h1>
-              <StatusBadge variant="success">
+              <Badge variant="success" dot>
                 Programado: {site.frequency}
-              </StatusBadge>
+              </Badge>
             </div>
             <div className="text-xs mt-1.5 font-mono text-slate-500 flex items-center gap-3 flex-wrap">
               <span>URL: <strong className="text-slate-800">{site.url}</strong></span>
@@ -112,37 +114,32 @@ export default function SiteDetailPage({
 
           {/* Action buttons */}
           <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={handleTriggerCrawl}
-              className="flex items-center gap-2 px-4 py-2.5 text-xs font-bold rounded-lg transition-all shadow-xs cursor-pointer bg-[#3ddc84] hover:bg-[#2bc971] active:scale-95 text-[#0a1f14]"
-            >
+            <Button onClick={handleTriggerCrawl}>
               <IconPlay />
               Ejecutar Crawl Ahora
-            </button>
+            </Button>
 
-            <Link
-              href={`/sites/${site._id}/edit`}
-              className="flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors shadow-xs"
-            >
-              <IconEdit />
-              Editar Configuración
+            <Link href={`/sites/${site._id}/edit`}>
+              <Button variant="outline">
+                <IconEdit />
+                Editar Configuración
+              </Button>
             </Link>
 
-            <button
-              type="button"
+            <Button
+              variant="destructive"
+              size="icon"
               onClick={() => setShowDeleteModal(true)}
               title="Eliminar sitio"
-              className="p-2.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 transition-colors cursor-pointer"
             >
               <IconTrash />
-            </button>
+            </Button>
           </div>
         </div>
 
         {/* Panel 1: Historical Snapshots */}
-        <div className="rounded-xl mb-6 bg-white border border-slate-200 shadow-xs">
-          <div className="px-6 py-4 flex items-center justify-between border-b border-slate-100 flex-wrap gap-2">
+        <Card className="mb-6">
+          <CardHeader className="flex-row items-center justify-between p-4 px-6 border-b border-slate-100 flex-wrap gap-2">
             <div>
               <div className="text-xs font-bold text-slate-900 tracking-wider">
                 SNAPSHOTS HISTÓRICOS DEL SITIO ({siteSnapshots.length})
@@ -159,7 +156,7 @@ export default function SiteDetailPage({
                 </strong>
               </span>
             )}
-          </div>
+          </CardHeader>
 
           <div className="p-4">
             <SnapshotBar
@@ -168,7 +165,7 @@ export default function SiteDetailPage({
               onSelect={setSelectedSnapshotId}
             />
           </div>
-        </div>
+        </Card>
 
         {/* Panel 2: Documents Grid or Zero-Snapshot Empty State */}
         {siteSnapshots.length === 0 ? (
@@ -177,19 +174,15 @@ export default function SiteDetailPage({
             title="Este sitio aún no tiene documentos indexados"
             description={`Aún no se ha realizado ninguna corrida de crawler para ${site.name}. Presioná el botón a continuación para iniciar la primera indexación.`}
             action={
-              <button
-                type="button"
-                onClick={handleTriggerCrawl}
-                className="px-5 py-2.5 text-xs font-bold rounded-lg bg-[#3ddc84] hover:bg-[#2bc971] active:scale-95 text-[#0a1f14] transition-all cursor-pointer shadow-xs inline-flex items-center gap-2"
-              >
+              <Button onClick={handleTriggerCrawl}>
                 <IconPlay />
                 Iniciar Primera Indexación
-              </button>
+              </Button>
             }
           />
         ) : (
-          <div className="rounded-xl bg-white border border-slate-200 shadow-xs">
-            <div className="px-6 py-4 flex items-center justify-between gap-4 border-b border-slate-100 flex-wrap">
+          <Card>
+            <CardHeader className="flex-row items-center justify-between p-4 px-6 border-b border-slate-100 flex-wrap gap-4">
               <div>
                 <div className="text-xs font-bold text-slate-900 tracking-wider">
                   DOCUMENTOS EXTRAÍDOS DEL SNAPSHOT ({activeSnapshot ? activeSnapshot.id : "—"})
@@ -206,10 +199,10 @@ export default function SiteDetailPage({
                 placeholder="Filtrar por título, url o descripción..."
                 className="min-w-[280px]"
               />
-            </div>
+            </CardHeader>
 
             {/* Cards Grid */}
-            <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredDocs.map((doc) => (
                 <DocumentCard key={doc.id} document={doc} siteId={site._id} />
               ))}
@@ -221,8 +214,8 @@ export default function SiteDetailPage({
                     : `Sin documentos que coincidan con "${querySearch}".`}
                 </div>
               )}
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         )}
 
       </div>

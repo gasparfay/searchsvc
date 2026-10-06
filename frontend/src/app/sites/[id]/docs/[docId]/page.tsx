@@ -3,9 +3,17 @@
 import { use } from "react";
 import Link from "next/link";
 import { useApp } from "@/context/AppContext";
-import { IconArrowLeft, IconExternalLink } from "@/components/icons";
-import StatusBadge from "@/components/StatusBadge";
-import { Card, CardHeader, CardBody, CardFooter } from "@/components/Card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+import EmptyState from "@/components/EmptyState";
+import DocNavigation from "@/components/DocNavigation";
+import ExternalLink from "@/components/ExternalLink";
 import CodeBlock from "@/components/CodeBlock";
 import MetadataGrid from "@/components/MetadataGrid";
 
@@ -22,19 +30,19 @@ export default function DocumentDetailPage({
 
   if (!document) {
     return (
-      <div className="h-full flex flex-col items-center justify-center p-8 text-center bg-slate-100">
-        <h2 className="text-lg font-bold text-slate-800 mb-2">
-          Documento no encontrado
-        </h2>
-        <p className="text-xs text-slate-500 mb-4">
-          No se encontró ningún documento con el ID {docId}.
-        </p>
-        <Link
-          href={`/sites/${siteId}`}
-          className="text-xs text-emerald-600 font-bold hover:underline"
-        >
-          Volver al Sitio
-        </Link>
+      <div className="h-full flex items-center justify-center p-8 bg-slate-100">
+        <EmptyState
+          title="Documento no encontrado"
+          description={`No se encontró ningún documento con el ID ${docId}.`}
+          action={
+            <Link
+              href={`/sites/${siteId}`}
+              className="text-xs text-emerald-600 font-bold hover:underline"
+            >
+              Volver al Sitio
+            </Link>
+          }
+        />
       </div>
     );
   }
@@ -50,43 +58,20 @@ export default function DocumentDetailPage({
     <div className="h-full overflow-y-auto bg-slate-100">
       <div className="px-10 py-8 max-w-5xl mx-auto">
         {/* Navigation Bar */}
-        <div className="flex items-center justify-between mb-6">
-          <Link
-            href={`/sites/${siteId}`}
-            className="text-xs inline-flex items-center gap-1.5 text-slate-500 hover:text-slate-800 transition-colors font-medium"
-          >
-            <IconArrowLeft />
-            Volver a {site?.name || "Mis Sitios"}
-          </Link>
-
-          <div className="flex items-center gap-2">
-            {prevDoc && (
-              <Link
-                href={`/sites/${siteId}/docs/${prevDoc.id}`}
-                className="px-3 py-1.5 text-xs rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors font-medium shadow-xs"
-              >
-                ← Anterior
-              </Link>
-            )}
-            {nextDoc && (
-              <Link
-                href={`/sites/${siteId}/docs/${nextDoc.id}`}
-                className="px-3 py-1.5 text-xs rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors font-medium shadow-xs"
-              >
-                Siguiente →
-              </Link>
-            )}
-          </div>
-        </div>
+        <DocNavigation
+          backHref={`/sites/${siteId}`}
+          backLabel={`Volver a ${site?.name || "Mis Sitios"}`}
+          prevHref={prevDoc ? `/sites/${siteId}/docs/${prevDoc.id}` : undefined}
+          nextHref={nextDoc ? `/sites/${siteId}/docs/${nextDoc.id}` : undefined}
+        />
 
         {/* Main Document Card */}
         <Card>
-          {/* Header */}
           <CardHeader>
-            <div className="flex items-center gap-2.5 mb-2.5 flex-wrap">
-              <StatusBadge variant="success" className="text-[11px] font-bold">
+            <div className="flex items-center gap-2.5 mb-1.5 flex-wrap">
+              <Badge variant="success">
                 HTTP {document.httpStatus || 200} OK
-              </StatusBadge>
+              </Badge>
               <span className="text-xs text-slate-400 font-mono">
                 Doc ID: {document.id}
               </span>
@@ -96,23 +81,14 @@ export default function DocumentDetailPage({
               </span>
             </div>
 
-            <h1 className="text-2xl font-bold text-slate-900 leading-snug mb-3">
-              {document.name}
-            </h1>
+            <CardTitle>{document.name}</CardTitle>
 
-            <a
-              href={document.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs font-mono text-emerald-600 hover:text-emerald-700 hover:underline inline-flex items-center gap-1.5 break-all"
-            >
-              {document.url}
-              <IconExternalLink />
-            </a>
+            <div className="mt-1">
+              <ExternalLink href={document.url} />
+            </div>
           </CardHeader>
 
-          {/* Body */}
-          <CardBody>
+          <CardContent>
             {/* Description */}
             <div>
               <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
@@ -144,9 +120,8 @@ export default function DocumentDetailPage({
                 },
               ]}
             />
-          </CardBody>
+          </CardContent>
 
-          {/* Footer */}
           <CardFooter>
             <Link
               href={`/sites/${siteId}`}

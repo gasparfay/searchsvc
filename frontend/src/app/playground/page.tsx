@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useApp } from "@/context/AppContext";
 import { IconCopy, IconCheck, IconPlayground } from "@/components/icons";
 import PageHeader from "@/components/PageHeader";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 const PRESET_QUERIES = ["catalogo", "productos", "soporte", "hardware", "contacto", "garantia"];
 
@@ -348,14 +350,12 @@ db.documents.find(${JSON.stringify(filter, null, 2)});`;
         </div>
 
         {/* Panel 2: Respuesta de la API */}
-        <div className="rounded-xl overflow-hidden shadow-xs bg-white border border-slate-200 mb-6">
-          <div className="px-6 py-4 flex items-center justify-between border-b border-slate-100 flex-wrap gap-3">
+        <Card className="mb-6">
+          <CardHeader className="flex-row items-center justify-between p-4 px-6 border-b border-slate-100 flex-wrap gap-3">
             <div className="flex items-center gap-3">
-              <span className={`px-2.5 py-1 rounded text-xs font-bold font-mono ${
-                isAuthorized ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"
-              }`}>
+              <Badge variant={isAuthorized ? "success" : "destructive"} className="font-mono text-xs">
                 {isAuthorized ? "HTTP 200 OK" : "HTTP 401 Unauthorized"}
-              </span>
+              </Badge>
               <span className="text-xs text-slate-500">
                 Latencia: <strong className="text-slate-800 font-mono">{isAuthorized ? "24 ms" : "3 ms"}</strong>
               </span>
@@ -403,9 +403,9 @@ db.documents.find(${JSON.stringify(filter, null, 2)});`;
                 MongoDB Query ($text)
               </button>
             </div>
-          </div>
+          </CardHeader>
 
-          <div className="p-6">
+          <CardContent className="p-6">
             {activeTab === "cards" && (
               <div>
                 {!isAuthorized ? (
@@ -539,11 +539,11 @@ User-Agent: SearchServiceClient/1.0`}
                 </div>
               </div>
             )}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Panel 3: Guía de integración en clientes */}
-        <div className="rounded-xl overflow-hidden shadow-xs bg-white border border-slate-200 p-6">
+        <Card className="p-6">
           <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
             <div>
               <h3 className="text-sm font-bold text-slate-900">
@@ -574,7 +574,7 @@ User-Agent: SearchServiceClient/1.0`}
             {activeLang === "fetch" && `const response = await fetch("${fullEndpointUrl}", {\n  headers: {\n    "Authorization": "${currentKey}",\n    "Accept": "application/json"\n  }\n});\nconst documents = await response.json();\nconsole.log(documents);`}
             {activeLang === "python" && `import requests\n\nurl = "http://localhost:3000/search"\nparams = ${JSON.stringify(Object.fromEntries(new URLSearchParams(endpointQueryString.replace(/^\?/, ""))))}\nheaders = {"Authorization": "${currentKey}"}\n\nresponse = requests.get(url, params=params, headers=headers)\ndocuments = response.json()\nprint(documents)`}
           </pre>
-        </div>
+        </Card>
       </div>
     </div>
   );

@@ -3,9 +3,19 @@
 import Link from "next/link";
 import type { Site } from "@/types";
 import { IconSites, IconEye, IconEdit, IconTrash } from "@/components/icons";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader } from "@/components/ui/card";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table";
 import EmptyState from "@/components/EmptyState";
 import SearchInput from "@/components/SearchInput";
-import StatusBadge from "@/components/StatusBadge";
 
 interface SiteTableProps {
   sites: Site[];
@@ -33,11 +43,8 @@ export default function SiteTable({
         title="Aún no tienes sitios registrados"
         description="Configurá la URL base del sitio web que deseás que el crawler explore, junto a los selectores de contenido y frecuencia de rastreo."
         action={
-          <Link
-            href="/sites/new"
-            className="px-5 py-2.5 text-xs font-bold rounded-lg bg-[#3ddc84] hover:bg-[#2bc971] text-[#0a1f14] transition-all shadow-xs inline-flex items-center gap-1.5 cursor-pointer active:scale-95"
-          >
-            + Registrar mi primer sitio
+          <Link href="/sites/new">
+            <Button>+ Registrar mi primer sitio</Button>
           </Link>
         }
       />
@@ -45,10 +52,9 @@ export default function SiteTable({
   }
 
   return (
-    <div className="rounded-lg overflow-hidden bg-white border border-slate-200 shadow-xs">
+    <Card>
       {/* Header bar with Search and Sort */}
-      <div className="px-6 py-4 flex items-center justify-between gap-4 flex-wrap border-b border-slate-100">
-
+      <CardHeader className="flex-row items-center justify-between p-4 px-6 border-b border-slate-100 flex-wrap gap-4">
         <div className="flex items-center gap-3">
           <div className="text-xs font-bold text-slate-900 tracking-wider">
             LISTADO DE SITIOS ({filteredSites.length}
@@ -83,120 +89,117 @@ export default function SiteTable({
             </select>
           </div>
         </div>
-      </div>
+      </CardHeader>
 
       {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-slate-100 bg-slate-50/70">
-              {["Sitio / ID", "URL Base", "Profundidad", "Frecuencia", "Último Snapshot", "Docs", "Acciones"].map((h) => (
-                <th key={h} className="text-left px-6 py-3.5 text-xs font-medium text-slate-400 tracking-wider">
-                  {h.toUpperCase()}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {filteredSites.map((s, i) => {
-              const isOk = s.lastRunStatus === "ok";
+      <Table>
+        <TableHeader>
+          <TableRow>
+            {["Sitio / ID", "URL Base", "Profundidad", "Frecuencia", "Último Snapshot", "Docs", "Acciones"].map((h) => (
+              <TableHead key={h}>
+                {h}
+              </TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {filteredSites.map((s) => {
+            const isOk = s.lastRunStatus === "ok";
 
-              return (
-                <tr
-                  key={s._id}
-                  className={`transition-colors hover:bg-slate-50/70 ${
-                    i < filteredSites.length - 1 ? "border-b border-slate-50" : ""
-                  }`}
-                >
-                  <td className="px-6 py-4">
+            return (
+              <TableRow key={s._id}>
+                <TableCell>
+                  <Link
+                    href={`/sites/${s._id}`}
+                    className="text-sm font-semibold text-slate-900 hover:text-emerald-700 hover:underline block"
+                  >
+                    {s.name}
+                  </Link>
+                  <div className="text-xs mt-0.5 font-mono text-slate-400">{s._id}</div>
+                </TableCell>
+                <TableCell className="font-mono text-slate-600">
+                  {s.url}
+                </TableCell>
+                <TableCell className="text-slate-500">
+                  <span className="font-semibold text-slate-700">{s.maxDepth}</span>{" "}
+                  {s.maxDepth === 1 ? "nivel" : "niveles"}
+                </TableCell>
+                <TableCell className="text-slate-500">
+                  {s.frequency}
+                </TableCell>
+                <TableCell>
+                  <div className="text-slate-800">{s.lastRunDate || "Sin corridas"}</div>
+                  {s.lastRunStatus && (
+                    <div className="mt-1">
+                      <Badge variant={isOk ? "success" : "destructive"} dot className="text-[10px]">
+                        {isOk ? "Snapshot OK" : "Con errores"}
+                      </Badge>
+                    </div>
+                  )}
+                </TableCell>
+                <TableCell className="text-sm font-semibold text-slate-900">
+                  {(s.docsCount || 0).toLocaleString("es")}
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    {/* Ver detalle */}
                     <Link
                       href={`/sites/${s._id}`}
-                      className="text-sm font-semibold text-slate-900 hover:text-emerald-700 hover:underline block"
+                      title="Ver snapshots y documentos"
+                      className="p-2.5 rounded transition-all inline-flex items-center justify-center text-emerald-600 bg-emerald-50 hover:bg-emerald-100"
                     >
-                      {s.name}
+                      <IconEye />
                     </Link>
-                    <div className="text-xs mt-0.5 font-mono text-slate-400">{s._id}</div>
-                  </td>
-                  <td className="px-6 py-4 text-xs font-mono text-slate-600">{s.url}</td>
-                  <td className="px-6 py-4 text-xs text-slate-500">
-                    <span className="font-semibold text-slate-700">{s.maxDepth}</span>{" "}
-                    {s.maxDepth === 1 ? "nivel" : "niveles"}
-                  </td>
-                  <td className="px-6 py-4 text-xs text-slate-500">{s.frequency}</td>
-                  <td className="px-6 py-4 text-xs">
-                    <div className="text-slate-800">{s.lastRunDate || "Sin corridas"}</div>
-                    {s.lastRunStatus && (
-                      <div className="mt-1">
-                        <StatusBadge variant={isOk ? "success" : "error"} className="text-[10px]">
-                          {isOk ? "Snapshot OK" : "Con errores"}
-                        </StatusBadge>
-                      </div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-sm font-semibold text-slate-900">
-                    {(s.docsCount || 0).toLocaleString("es")}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      {/* Ver detalle */}
-                      <Link
-                        href={`/sites/${s._id}`}
-                        title="Ver snapshots y documentos"
-                        className="p-2.5 rounded transition-all inline-flex items-center justify-center text-emerald-600 bg-emerald-50 hover:bg-emerald-100"
-                      >
-                        <IconEye />
-                      </Link>
 
-                      {/* Editar */}
-                      <Link
-                        href={`/sites/${s._id}/edit`}
-                        title="Editar configuración del sitio"
-                        className="p-2.5 rounded transition-all inline-flex items-center justify-center text-slate-500 bg-slate-100 hover:bg-slate-200 hover:text-slate-800"
-                      >
-                        <IconEdit />
-                      </Link>
+                    {/* Editar */}
+                    <Link
+                      href={`/sites/${s._id}/edit`}
+                      title="Editar configuración del sitio"
+                      className="p-2.5 rounded transition-all inline-flex items-center justify-center text-slate-500 bg-slate-100 hover:bg-slate-200 hover:text-slate-800"
+                    >
+                      <IconEdit />
+                    </Link>
 
-                      {/* Eliminar */}
-                      <button
-                        type="button"
-                        onClick={() => onRequestDelete({ id: s._id, name: s.name })}
-                        title="Eliminar sitio"
-                        className="p-2.5 rounded transition-all inline-flex items-center justify-center text-red-500 bg-red-50 hover:bg-red-100 hover:text-red-700 cursor-pointer"
-                      >
-                        <IconTrash />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
+                    {/* Eliminar */}
+                    <button
+                      type="button"
+                      onClick={() => onRequestDelete({ id: s._id, name: s.name })}
+                      title="Eliminar sitio"
+                      className="p-2.5 rounded transition-all inline-flex items-center justify-center text-red-500 bg-red-50 hover:bg-red-100 hover:text-red-700 cursor-pointer"
+                    >
+                      <IconTrash />
+                    </button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            );
+          })}
 
-            {filteredSites.length === 0 && (
-              <tr>
-                <td colSpan={7} className="text-center py-12 text-sm text-slate-400">
-                  {searchQuery ? (
-                    <div>
-                      <p className="mb-2">
-                        No se encontraron sitios que coincidan con &quot;
-                        <span className="text-slate-700 font-medium">{searchQuery}</span>&quot;
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => onSearchChange("")}
-                        className="text-xs text-emerald-600 font-bold hover:underline cursor-pointer"
-                      >
-                        Limpiar filtro de búsqueda
-                      </button>
-                    </div>
-                  ) : (
-                    "No tienes sitios registrados. Haz clic en '+ Registrar Nuevo Sitio' para comenzar."
-                  )}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
+          {filteredSites.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={7} className="text-center py-12 text-sm text-slate-400">
+                {searchQuery ? (
+                  <div>
+                    <p className="mb-2">
+                      No se encontraron sitios que coincidan con &quot;
+                      <span className="text-slate-700 font-medium">{searchQuery}</span>&quot;
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => onSearchChange("")}
+                      className="text-xs text-emerald-600 font-bold hover:underline cursor-pointer"
+                    >
+                      Limpiar filtro de búsqueda
+                    </button>
+                  </div>
+                ) : (
+                  "No tienes sitios registrados. Haz clic en '+ Registrar Nuevo Sitio' para comenzar."
+                )}
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </Card>
   );
 }

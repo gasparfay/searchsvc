@@ -6,6 +6,8 @@ import { useApp } from "@/context/AppContext";
 import { IconCopy, IconCheck, IconRefresh } from "@/components/icons";
 import PageHeader from "@/components/PageHeader";
 import StatusBadge from "@/components/StatusBadge";
+import ConfirmModal from "@/components/ConfirmModal";
+import { Button } from "@/components/ui/button";
 
 export default function ConfigPage() {
   const { account } = useApp();
@@ -219,32 +221,16 @@ export default function ConfigPage() {
         </div>
 
         {/* Modal de confirmación para regenerar API Key */}
-        {showRegenerateConfirm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-            <div className="w-full max-w-md rounded-xl p-6 shadow-2xl bg-white border border-slate-200">
-              <h3 className="text-base font-bold text-slate-900 mb-2">¿Regenerar API Key?</h3>
-              <p className="text-xs text-slate-600 leading-relaxed mb-6">
-                Se generará un nuevo UUID aleatorio. La clave anterior quedará inmediatamente invalidada y cualquier integración externa dejará de autenticar hasta que se actualice.
-              </p>
-              <div className="flex items-center justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowRegenerateConfirm(false)}
-                  className="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 cursor-pointer"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  onClick={handleRegenerar}
-                  className="px-4 py-2 text-xs font-bold rounded-lg text-slate-950 bg-yellow-400 hover:bg-yellow-500 border border-yellow-500 shadow-xs cursor-pointer"
-                >
-                  Sí, Regenerar Llave
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        <ConfirmModal
+          isOpen={showRegenerateConfirm}
+          title="¿Regenerar API Key?"
+          description="Se generará un nuevo UUID aleatorio. La clave anterior quedará inmediatamente invalidada y cualquier integración externa dejará de autenticar hasta que se actualice."
+          confirmLabel="Sí, Regenerar Llave"
+          cancelLabel="Cancelar"
+          confirmVariant="default"
+          onConfirm={handleRegenerar}
+          onCancel={() => setShowRegenerateConfirm(false)}
+        />
 
         {/* Panel 2: Perfil de Usuario */}
         <form onSubmit={handleGuardar} className="rounded-xl shadow-xs overflow-hidden bg-white border border-slate-200">
@@ -306,10 +292,7 @@ export default function ConfigPage() {
           </div>
 
           <div className="px-6 py-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-end">
-            <button
-              type="submit"
-              className="px-5 py-2.5 text-xs font-bold rounded-lg transition-all inline-flex items-center gap-1.5 bg-[#3ddc84] hover:bg-[#2bc971] active:scale-95 text-[#0a1f14] cursor-pointer shadow-xs"
-            >
+            <Button type="submit">
               {guardado ? (
                 <>
                   <IconCheck />
@@ -318,7 +301,7 @@ export default function ConfigPage() {
               ) : (
                 "Guardar Cambios"
               )}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

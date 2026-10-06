@@ -4,13 +4,21 @@ import Link from "next/link";
 import { useApp } from "@/context/AppContext";
 import PageHeader from "@/components/PageHeader";
 import StatCard from "@/components/StatCard";
-import StatusBadge from "@/components/StatusBadge";
-import type { BadgeVariant } from "@/components/StatusBadge";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardHeader } from "@/components/ui/card";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table";
 
-const STATUS_VARIANT_MAP: Record<string, { label: string; variant: BadgeVariant }> = {
+const STATUS_VARIANT_MAP: Record<string, { label: string; variant: "success" | "warning" | "destructive" }> = {
   completado: { label: "Completado", variant: "success" },
   corriendo:  { label: "En curso",   variant: "warning" },
-  error:      { label: "Error",      variant: "error" },
+  error:      { label: "Error",      variant: "destructive" },
 };
 
 export default function MonitorPage() {
@@ -62,92 +70,84 @@ export default function MonitorPage() {
         </div>
 
         {/* Table Card */}
-        <div className="rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xs">
-          <div className="px-6 py-4 flex items-center justify-between border-b border-slate-100">
+        <Card>
+          <CardHeader className="flex-row items-center justify-between p-4 px-6 border-b border-slate-100 flex-wrap gap-2">
             <div className="text-xs font-bold text-slate-900 tracking-wider">
               CORRIDAS RECIENTES ({jobs.length})
             </div>
             <div className="text-xs text-slate-400">
               Haz clic en el sitio para inspeccionar sus snapshots y documentos extraídos.
             </div>
-          </div>
+          </CardHeader>
 
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-slate-100 bg-slate-50/75">
-                  {["Job ID", "Sitio", "Inicio", "Duración", "Páginas", "Documentos", "Errores", "Estado", ""].map((header) => (
-                    <th
-                      key={header}
-                      className="text-left px-6 py-3.5 text-xs font-medium text-slate-400 tracking-wider uppercase"
-                    >
-                      {header}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {jobs.map((job) => {
-                  const statusInfo = STATUS_VARIANT_MAP[job.estado] || STATUS_VARIANT_MAP.completado;
-                  return (
-                    <tr
-                      key={job.id}
-                      className="hover:bg-slate-50/80 transition-colors"
-                    >
-                      <td className="px-6 py-4 text-xs font-mono font-bold text-slate-900">
-                        {job.id}
-                      </td>
-                      <td className="px-6 py-4">
-                        <Link
-                          href={`/sites/${job.siteId}`}
-                          className="text-xs font-semibold text-slate-800 hover:text-emerald-700 hover:underline"
-                        >
-                          {job.sitio}
-                        </Link>
-                      </td>
-                      <td className="px-6 py-4 text-xs text-slate-500">
-                        {job.inicio}
-                      </td>
-                      <td className="px-6 py-4 text-xs font-mono text-slate-500">
-                        {job.duracion}
-                      </td>
-                      <td className="px-6 py-4 text-xs font-semibold text-slate-900">
-                        {job.paginas.toLocaleString("es")}
-                      </td>
-                      <td className="px-6 py-4 text-xs font-semibold text-slate-900">
-                        {job.docs.toLocaleString("es")}
-                      </td>
-                      <td className={`px-6 py-4 text-xs font-bold ${job.errores > 0 ? "text-red-500" : "text-slate-400"}`}>
-                        {job.errores}
-                      </td>
-                      <td className="px-6 py-4">
-                        <StatusBadge variant={statusInfo.variant}>
-                          {statusInfo.label}
-                        </StatusBadge>
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <Link
-                          href={`/sites/${job.siteId}`}
-                          className="text-xs text-emerald-600 hover:text-emerald-800 font-semibold hover:underline"
-                        >
-                          Ver Sitio →
-                        </Link>
-                      </td>
-                    </tr>
-                  );
-                })}
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {["Job ID", "Sitio", "Inicio", "Duración", "Páginas", "Documentos", "Errores", "Estado", ""].map((header) => (
+                  <TableHead key={header}>
+                    {header}
+                  </TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {jobs.map((job) => {
+                const statusInfo = STATUS_VARIANT_MAP[job.estado] || STATUS_VARIANT_MAP.completado;
+                return (
+                  <TableRow key={job.id}>
+                    <TableCell className="font-mono font-bold text-slate-900">
+                      {job.id}
+                    </TableCell>
+                    <TableCell>
+                      <Link
+                        href={`/sites/${job.siteId}`}
+                        className="text-xs font-semibold text-slate-800 hover:text-emerald-700 hover:underline"
+                      >
+                        {job.sitio}
+                      </Link>
+                    </TableCell>
+                    <TableCell className="text-slate-500">
+                      {job.inicio}
+                    </TableCell>
+                    <TableCell className="font-mono text-slate-500">
+                      {job.duracion}
+                    </TableCell>
+                    <TableCell className="font-semibold text-slate-900">
+                      {job.paginas.toLocaleString("es")}
+                    </TableCell>
+                    <TableCell className="font-semibold text-slate-900">
+                      {job.docs.toLocaleString("es")}
+                    </TableCell>
+                    <TableCell className={`font-bold ${job.errores > 0 ? "text-red-500" : "text-slate-400"}`}>
+                      {job.errores}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={statusInfo.variant} dot>
+                        {statusInfo.label}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Link
+                        href={`/sites/${job.siteId}`}
+                        className="text-xs text-emerald-600 hover:text-emerald-800 font-semibold hover:underline"
+                      >
+                        Ver Sitio →
+                      </Link>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
 
-                {jobs.length === 0 && (
-                  <tr>
-                    <td colSpan={9} className="px-6 py-12 text-center text-xs text-slate-400">
-                      No hay tareas ni corridas de crawler registradas todavía.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+              {jobs.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={9} className="py-12 text-center text-slate-400">
+                    No hay tareas ni corridas de crawler registradas todavía.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </Card>
       </div>
     </div>
   );
