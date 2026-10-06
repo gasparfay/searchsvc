@@ -10,39 +10,49 @@ const PRESET_QUERIES = ["catalogo", "productos", "soporte", "hardware", "contact
 export default function PlaygroundPage() {
   const { account, documents, sites } = useApp();
 
-  const [query, setQuery] = useState(() => {
-    if (typeof window !== "undefined") {
-      const sp = new URLSearchParams(window.location.search);
-      return sp.get("q") ?? "productos";
-    }
-    return "productos";
-  });
-  const [selectedSiteId, setSelectedSiteId] = useState<string>(() => {
-    if (typeof window !== "undefined") {
-      const sp = new URLSearchParams(window.location.search);
-      return sp.get("siteId") ?? "all";
-    }
-    return "all";
-  });
+  const [query, setQuery] = useState("productos");
+  const [selectedSiteId, setSelectedSiteId] = useState("all");
   const [useCustomKey, setUseCustomKey] = useState(false);
   const [customApiKey, setCustomApiKey] = useState(account.apiKey);
-  const [activeTab, setActiveTab] = useState<"cards" | "json" | "headers">("cards");
+  const [activeTab, setActiveTab] = useState<"cards" | "json" | "headers" | "mongo">("cards");
   const [copiedJson, setCopiedJson] = useState(false);
   const [copiedCurl, setCopiedCurl] = useState(false);
+  const [copiedMongo, setCopiedMongo] = useState(false);
   const [activeLang, setActiveLang] = useState<"curl" | "fetch" | "python">("curl");
 
-  // Synchronize browser's actual address bar with query parameters
+  // Read initial query parameters on client mount (safe for Next.js SSR)
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const params = new URLSearchParams();
-      if (query.trim()) params.set("q", query.trim());
-      if (selectedSiteId !== "all") params.set("siteId", selectedSiteId);
-      const newRelativePath = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
-      window.history.replaceState(null, "", newRelativePath);
+      const sp = new URLSearchParams(window.location.search);
+      const qParam = sp.get("q");
+      const siteIdParam = sp.get("siteId");
+      if (qParam) setQuery(qParam);
+      if (siteIdParam) setSelectedSiteId(siteIdParam);
     }
-  }, [query, selectedSiteId]);
+  }, []);
 
-  // Effective key being sent
+  // Update browser URL on explicit user interactions without re-render cascades
+  const updateUrl = (newQuery: string, newSiteId: string) => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams();
+      if (newQuery.trim()) params.set("q", newQuery.trim());
+      if (newSiteId !== "all") params.set("siteId", newSiteId);
+      const qs = params.toString() ? `?${params.toString()}` : "";
+      window.history.replaceState(null, "", `${window.location.pathname}${qs}`);
+    }
+  };
+
+  const handleQueryChange = (val: string) => {
+    setQuery(val);
+    updateUrl(val, selectedSiteId);
+  };
+
+  const handleSiteChange = (val: string) => {
+    setSelectedSiteId(val);
+    updateUrl(query, val);
+  };
+
+  // Effective authorization key
   const currentKey = useCustomKey ? customApiKey : account.apiKey;
   const isAuthorized = Boolean(currentKey && currentKey.trim() === account.apiKey);
 
@@ -53,6 +63,9 @@ export default function PlaygroundPage() {
     if (selectedSiteId !== "all") params.set("siteId", selectedSiteId);
     return params.toString() ? `?${params.toString()}` : "";
   }, [query, selectedSiteId]);
+
+  // Full URL display
+  const fullEndpointUrl = `http://localhost:3000/search${endpointQueryString}`;
 
   // Simulated search results across indexed documents
   const searchResults = useMemo(() => {
@@ -103,6 +116,25 @@ export default function PlaygroundPage() {
     return JSON.stringify(formattedResults, null, 2);
   }, [isAuthorized, formattedResults]);
 
+  // MongoDB $text query representation according to Search Service spec
+  const mongoQueryString = useMemo(() => {
+    const filter: Record<string, unknown> = {
+      accountId: account._id,
+    };
+    if (selectedSiteId !== "all") {
+      filter.siteId = selectedSiteId;
+    }
+    filter.$text = { $search: query.trim() || "..." };
+
+    return `// Consulta ejecutada en MongoDB con índice de texto ($text)
+// Especificación Search Service Spec (PDF)
+//
+// Índice requerido en MongoDB:
+// db.documents.createIndex({ name: "text", description: "text", content: "text" });
+
+db.documents.find(${JSON.stringify(filter, null, 2)});`;
+  }, [account._id, selectedSiteId, query]);
+
   const copyToClipboard = async (text: string) => {
     let success = false;
     if (typeof navigator !== "undefined" && navigator.clipboard && navigator.clipboard.writeText) {
@@ -110,7 +142,7 @@ export default function PlaygroundPage() {
         await navigator.clipboard.writeText(text);
         success = true;
       } catch {
-        // fallback below
+        // continue
       }
     }
     if (!success && typeof document !== "undefined") {
@@ -141,10 +173,16 @@ export default function PlaygroundPage() {
   }
 
   async function handleCopyCurl() {
-    const curl = `curl -X GET "http://localhost:3000/search${endpointQueryString}" \\\n  -H "Authorization: ${currentKey}" \\\n  -H "Accept: application/json"`;
+    const curl = `curl -X GET "${fullEndpointUrl}" \\\n  -H "Authorization: ${currentKey}" \\\n  -H "Accept: application/json"`;
     await copyToClipboard(curl);
     setCopiedCurl(true);
     setTimeout(() => setCopiedCurl(false), 2000);
+  }
+
+  async function handleCopyMongo() {
+    await copyToClipboard(mongoQueryString);
+    setCopiedMongo(true);
+    setTimeout(() => setCopiedMongo(false), 2000);
   }
 
   return (
@@ -164,13 +202,13 @@ export default function PlaygroundPage() {
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1 max-w-2xl">
-            Comprobá de forma interactiva cómo las aplicaciones externas consumen el servicio de indexación utilizando la API Key global de tu cuenta.
+            Comprobá cómo las aplicaciones externas consumen el servicio de indexación con tu API Key y cómo MongoDB resuelve las consultas mediante índices <code className="bg-slate-200 px-1 py-0.5 rounded font-mono">$text</code>.
           </p>
         </div>
 
         {/* Panel 1: Barra de Petición HTTP */}
         <div className="rounded-xl overflow-hidden shadow-xs mb-6 bg-[#0e1525] border border-[#1e3a5f]">
-          <div className="px-6 py-4 flex items-center justify-between border-b border-slate-800">
+          <div className="px-6 py-4 flex items-center justify-between border-b border-slate-800 flex-wrap gap-2">
             <div className="flex items-center gap-2">
               <span className="text-emerald-400">
                 <IconPlayground />
@@ -179,9 +217,11 @@ export default function PlaygroundPage() {
                 REQUEST INSPECTOR
               </span>
             </div>
-            <div className="flex items-center gap-3 text-xs">
-              <span className="text-slate-400">Endpoint:</span>
-              <span className="font-mono text-emerald-400">http://localhost:3000/search{endpointQueryString}</span>
+            <div className="flex items-center gap-2 text-xs">
+              <span className="text-slate-400">URL del Endpoint:</span>
+              <span className="font-mono text-emerald-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
+                {fullEndpointUrl}
+              </span>
             </div>
           </div>
 
@@ -192,51 +232,57 @@ export default function PlaygroundPage() {
                 <span className="text-slate-300 font-medium">Ámbito de búsqueda:</span>
                 <select
                   value={selectedSiteId}
-                  onChange={(e) => setSelectedSiteId(e.target.value)}
+                  onChange={(e) => handleSiteChange(e.target.value)}
                   className="bg-slate-950 border border-slate-700 text-emerald-400 text-xs rounded-md px-3 py-1.5 focus:outline-none focus:border-emerald-500 font-mono cursor-pointer"
                 >
-                  <option value="all">Todos los sitios de la cuenta (Global - Spec PDF)</option>
+                  <option value="all">Global (todos los sitios de la cuenta - Spec PDF)</option>
                   {sites.map((s) => (
                     <option key={s._id} value={s._id}>
-                      Filtrar solo: {s.name} ({s._id})
+                      Filtrar por sitio: {s.name} ({s._id})
                     </option>
                   ))}
                 </select>
               </div>
               <div className="text-[11px] text-slate-400 font-mono">
                 {selectedSiteId === "all" ? (
-                  <span className="text-emerald-400/90">Buscando en todos los sitios de tu cuenta con tu API Key</span>
+                  <span className="text-emerald-400/90">Búsqueda global con API Key (sin parámetro &siteId)</span>
                 ) : (
-                  <span>Filtro activo: <code className="text-emerald-400">&amp;siteId={selectedSiteId}</code></span>
+                  <span>Filtro activo en URL: <code className="text-emerald-400 font-bold">&amp;siteId={selectedSiteId}</code></span>
                 )}
               </div>
             </div>
 
-            {/* Input de URL con método GET */}
-            <div className="flex items-center gap-2 bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex-wrap sm:flex-nowrap">
-              <span className="px-2.5 py-1.5 rounded bg-emerald-500/20 text-emerald-400 text-xs font-bold font-mono shrink-0">
-                GET
-              </span>
-              <span className="text-xs text-slate-400 font-mono shrink-0">
-                /search?q=
-              </span>
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="palabras-clave"
-                className="flex-1 min-w-[120px] bg-transparent text-sm text-slate-100 font-mono focus:outline-none placeholder-slate-600"
-              />
-              {selectedSiteId !== "all" && (
-                <span className="text-xs font-mono px-2 py-1 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-800/80 shrink-0">
-                  &amp;siteId={selectedSiteId}
+            {/* Barra de URL Unificada y Continua (GET) */}
+            <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 flex items-center justify-between gap-3 flex-wrap">
+              <div className="flex items-center gap-1.5 flex-1 min-w-0 font-mono text-xs overflow-x-auto py-1">
+                <span className="px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-400 font-bold shrink-0">
+                  GET
                 </span>
-              )}
+                <span className="text-slate-500 shrink-0">http://localhost:3000/search?q=</span>
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => handleQueryChange(e.target.value)}
+                  placeholder="palabras-clave"
+                  className="bg-slate-900 text-emerald-300 font-mono font-bold focus:outline-none px-2 py-0.5 rounded border border-slate-700 focus:border-emerald-500 shrink-0"
+                  style={{ width: `${Math.max(query.length + 2, 12)}ch` }}
+                />
+                {selectedSiteId !== "all" ? (
+                  <span className="text-emerald-400 font-bold bg-emerald-950 px-2 py-0.5 rounded border border-emerald-700 shrink-0">
+                    &amp;siteId={selectedSiteId}
+                  </span>
+                ) : (
+                  <span className="text-slate-600 text-[11px] italic ml-1 shrink-0">
+                    &amp;siteId=&lt;global&gt;
+                  </span>
+                )}
+              </div>
+
               <button
                 type="button"
                 onClick={handleCopyCurl}
                 title="Copiar comando cURL equivalente"
-                className="px-3 py-1.5 text-xs rounded bg-slate-900 border border-slate-700 text-slate-300 hover:text-white transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer hover:bg-slate-800"
+                className="px-3.5 py-1.5 text-xs rounded bg-slate-900 border border-slate-700 text-slate-300 hover:text-white transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer hover:bg-slate-800"
               >
                 {copiedCurl ? <IconCheck /> : <IconCopy />}
                 <span>{copiedCurl ? "Copiado" : "Copiar cURL"}</span>
@@ -250,8 +296,8 @@ export default function PlaygroundPage() {
                 <button
                   key={preset}
                   type="button"
-                  onClick={() => setQuery(preset)}
-                  className={`px-2 py-0.5 rounded text-[11px] font-mono transition-colors ${
+                  onClick={() => handleQueryChange(preset)}
+                  className={`px-2 py-0.5 rounded text-[11px] font-mono transition-colors cursor-pointer ${
                     query === preset
                       ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
                       : "bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800"
@@ -346,6 +392,15 @@ export default function PlaygroundPage() {
               >
                 Raw HTTP Request
               </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab("mongo")}
+                className={`px-3 py-1 text-xs font-semibold rounded transition-colors cursor-pointer ${
+                  activeTab === "mongo" ? "bg-white text-emerald-800 font-bold shadow-xs border border-emerald-200" : "text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                MongoDB Query ($text)
+              </button>
             </div>
           </div>
 
@@ -373,7 +428,8 @@ export default function PlaygroundPage() {
                       </div>
                     ) : (
                       <>
-                        No se encontraron documentos indexados que contengan &quot;<span className="text-slate-700 font-medium">{query}</span>&quot;.
+                        No se encontraron documentos indexados que contengan &quot;<span className="text-slate-700 font-medium">{query}</span>&quot;
+                        {selectedSiteId !== "all" && ` en el sitio seleccionado (${selectedSiteId})`}.
                         <div className="mt-2 text-slate-500">
                           Probá buscando términos como <code className="bg-slate-100 px-1 py-0.5 rounded font-mono">catalogo</code>, <code className="bg-slate-100 px-1 py-0.5 rounded font-mono">productos</code> o <code className="bg-slate-100 px-1 py-0.5 rounded font-mono">soporte</code>.
                         </div>
@@ -447,7 +503,7 @@ export default function PlaygroundPage() {
             {activeTab === "headers" && (
               <div>
                 <span className="text-xs font-mono text-slate-400 block mb-2">
-                  Petición HTTP en formato estándar:
+                  Petición HTTP en formato estándar (Search Service Spec):
                 </span>
                 <pre className="p-4 rounded-lg bg-slate-950 text-emerald-400 font-mono text-xs overflow-x-auto leading-relaxed border border-slate-900">
 {`GET /search${endpointQueryString} HTTP/1.1
@@ -456,6 +512,30 @@ Authorization: ${currentKey}
 Accept: application/json
 User-Agent: SearchServiceClient/1.0`}
                 </pre>
+              </div>
+            )}
+
+            {activeTab === "mongo" && (
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-mono text-slate-500">
+                    Sintaxis de consulta MongoDB con índice de texto ($text):
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleCopyMongo}
+                    className="px-3 py-1 text-xs rounded bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors flex items-center gap-1.5 font-mono cursor-pointer"
+                  >
+                    {copiedMongo ? <IconCheck /> : <IconCopy />}
+                    <span>{copiedMongo ? "Copiado" : "Copiar Consulta"}</span>
+                  </button>
+                </div>
+                <pre className="p-4 rounded-lg bg-slate-950 text-emerald-300 font-mono text-xs overflow-x-auto max-h-96 leading-relaxed border border-slate-900 select-all">
+                  {mongoQueryString}
+                </pre>
+                <div className="mt-3 p-3 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-600">
+                  <span className="font-bold text-slate-800">Nota del enunciado (Search Service Spec):</span> En MongoDB, el operador <code className="bg-slate-200 px-1 py-0.5 rounded font-mono font-bold">$text</code> permite búsquedas de texto indexadas con tokenización y stemming sobre los campos indexados (`name`, `description`, `content`), filtrando además por la cuenta del usuario (`accountId`) y opcionalmente por el sitio (`siteId`).
+                </div>
               </div>
             )}
           </div>
@@ -489,8 +569,8 @@ User-Agent: SearchServiceClient/1.0`}
           </div>
 
           <pre className="p-4 rounded-lg bg-slate-950 text-slate-200 font-mono text-xs overflow-x-auto leading-relaxed border border-slate-900">
-            {activeLang === "curl" && `curl -H "Authorization: ${currentKey}" \\\n  "http://localhost:3000/search${endpointQueryString}"`}
-            {activeLang === "fetch" && `const response = await fetch("http://localhost:3000/search${endpointQueryString}", {\n  headers: {\n    "Authorization": "${currentKey}",\n    "Accept": "application/json"\n  }\n});\nconst documents = await response.json();\nconsole.log(documents);`}
+            {activeLang === "curl" && `curl -H "Authorization: ${currentKey}" \\\n  "${fullEndpointUrl}"`}
+            {activeLang === "fetch" && `const response = await fetch("${fullEndpointUrl}", {\n  headers: {\n    "Authorization": "${currentKey}",\n    "Accept": "application/json"\n  }\n});\nconst documents = await response.json();\nconsole.log(documents);`}
             {activeLang === "python" && `import requests\n\nurl = "http://localhost:3000/search"\nparams = ${JSON.stringify(Object.fromEntries(new URLSearchParams(endpointQueryString.replace(/^\?/, ""))))}\nheaders = {"Authorization": "${currentKey}"}\n\nresponse = requests.get(url, params=params, headers=headers)\ndocuments = response.json()\nprint(documents)`}
           </pre>
         </div>
