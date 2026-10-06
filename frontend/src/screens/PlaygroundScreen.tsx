@@ -36,17 +36,25 @@ export default function PlaygroundScreen() {
   const { account, documents, sites } = useApp();
 
   const [query, setQuery] = useState("productos");
+  const [selectedSiteId, setSelectedSiteId] = useState<string>("all");
   const [useCustomKey, setUseCustomKey] = useState(false);
   const [customApiKey, setCustomApiKey] = useState(account.apiKey);
   const [activeTab, setActiveTab] = useState<"cards" | "json" | "headers">("cards");
   const [copiedJson, setCopiedJson] = useState(false);
   const [copiedCurl, setCopiedCurl] = useState(false);
-  const [copiedSnippet, setCopiedSnippet] = useState(false);
   const [activeLang, setActiveLang] = useState<"curl" | "fetch" | "python">("curl");
 
   // Effective key being sent
   const currentKey = useCustomKey ? customApiKey : account.apiKey;
   const isAuthorized = Boolean(currentKey && currentKey.trim() === account.apiKey);
+
+  // Endpoint path with query and optional siteId
+  const endpointQueryString = useMemo(() => {
+    const params = new URLSearchParams();
+    if (query) params.set("q", query);
+    if (selectedSiteId !== "all") params.set("siteId", selectedSiteId);
+    return params.toString() ? `?${params.toString()}` : "";
+  }, [query, selectedSiteId]);
 
   // Simulated search results across indexed documents
   const searchResults = useMemo(() => {
@@ -55,13 +63,16 @@ export default function PlaygroundScreen() {
 
     const q = query.toLowerCase().trim();
     return documents.filter((doc) => {
+      if (selectedSiteId !== "all" && doc.siteId !== selectedSiteId) {
+        return false;
+      }
       const matchName = doc.name.toLowerCase().includes(q);
       const matchDesc = doc.description.toLowerCase().includes(q);
       const matchContent = doc.content.toLowerCase().includes(q);
       const matchUrl = doc.url.toLowerCase().includes(q);
       return matchName || matchDesc || matchContent || matchUrl;
     });
-  }, [documents, query, isAuthorized]);
+  }, [documents, query, selectedSiteId, isAuthorized]);
 
   // Formatted response payload
   const formattedResults = useMemo(() => {
@@ -95,28 +106,42 @@ export default function PlaygroundScreen() {
   }, [isAuthorized, formattedResults]);
 
   const copyToClipboard = async (text: string) => {
-    try {
-      if (typeof navigator !== "undefined" && navigator.clipboard && window.isSecureContext) {
+    let success = false;
+    if (typeof navigator !== "undefined" && navigator.clipboard && navigator.clipboard.writeText) {
+      try {
         await navigator.clipboard.writeText(text);
-        return true;
+        success = true;
+      } catch {
+        // continue
       }
-    } catch {
-      // fallback
     }
-    try {
-      const textarea = document.createElement("textarea");
-      textarea.value = text;
-      textarea.style.position = "fixed";
-      textarea.style.left = "-9999px";
-      textarea.style.top = "-9999px";
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand("copy");
-      document.body.removeChild(textarea);
-      return true;
-    } catch {
-      return false;
+    if (!success && typeof document !== "undefined") {
+      try {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.style.position = "fixed";
+        textarea.style.top = "0";
+        textarea.style.left = "0";
+        textarea.style.width = "2em";
+        textarea.style.height = "2em";
+        textarea.style.padding = "0";
+        textarea.style.border = "none";
+        textarea.style.outline = "none";
+        textarea.style.boxShadow = "none";
+        textarea.style.background = "transparent";
+        textarea.style.opacity = "0.01";
+        textarea.style.zIndex = "99999";
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        textarea.setSelectionRange(0, text.length);
+        success = document.execCommand("copy");
+        document.body.removeChild(textarea);
+      } catch {
+        // continue
+      }
     }
+    return success;
   };
 
   async function handleCopyJson() {
@@ -126,7 +151,7 @@ export default function PlaygroundScreen() {
   }
 
   async function handleCopyCurl() {
-    const curl = `curl -X GET "http://localhost:3000/search?q=${encodeURIComponent(query)}" \\\n  -H "Authorization: ${currentKey}" \\\n  -H "Accept: application/json"`;
+    const curl = `curl -X GET "http://localhost:3000/search${endpointQueryString}" \\\n  -H "Authorization: ${currentKey}" \\\n  -H "Accept: application/json"`;
     await copyToClipboard(curl);
     setCopiedCurl(true);
     setTimeout(() => setCopiedCurl(false), 2000);
@@ -172,13 +197,39 @@ export default function PlaygroundScreen() {
           </div>
 
           <div className="p-6 space-y-4">
+            {/* Selector de Ámbito de Búsqueda (Todos los sitios vs un sitio específico) */}
+            <div className="flex items-center justify-between gap-4 flex-wrap text-xs bg-slate-900/80 p-3 rounded-lg border border-slate-800">
+              <div className="flex items-center gap-2.5">
+                <span className="text-slate-300 font-medium">Ámbito de búsqueda:</span>
+                <select
+                  value={selectedSiteId}
+                  onChange={(e) => setSelectedSiteId(e.target.value)}
+                  className="bg-slate-950 border border-slate-700 text-emerald-400 text-xs rounded-md px-3 py-1.5 focus:outline-none focus:border-emerald-500 font-mono cursor-pointer"
+                >
+                  <option value="all">Todos los sitios de la cuenta (Global - Spec PDF)</option>
+                  {sites.map((s) => (
+                    <option key={s._id} value={s._id}>
+                      Filtrar solo: {s.name} ({s._id})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="text-[11px] text-slate-400 font-mono">
+                {selectedSiteId === "all" ? (
+                  <span className="text-emerald-400/90">Buscando en todos los sitios de tu cuenta con tu API Key</span>
+                ) : (
+                  <span>Filtro activo: <code className="text-emerald-400">&amp;siteId={selectedSiteId}</code></span>
+                )}
+              </div>
+            </div>
+
             {/* Input de URL con método GET */}
             <div className="flex items-center gap-2 bg-slate-950 p-2 rounded-lg border border-slate-800">
               <span className="px-3 py-1.5 rounded bg-emerald-500/20 text-emerald-400 text-xs font-bold font-mono shrink-0">
                 GET
               </span>
               <span className="text-xs text-slate-500 font-mono shrink-0">
-                /search?q=
+                /search{endpointQueryString.split("=")[0] ? endpointQueryString.split("=")[0] + "=" : "?q="}
               </span>
               <input
                 type="text"
@@ -397,7 +448,7 @@ export default function PlaygroundScreen() {
                   Petición HTTP en formato estándar:
                 </span>
                 <pre className="p-4 rounded-lg bg-slate-950 text-emerald-400 font-mono text-xs overflow-x-auto leading-relaxed border border-slate-900">
-{`GET /search?q=${encodeURIComponent(query)} HTTP/1.1
+{`GET /search${endpointQueryString} HTTP/1.1
 Host: localhost:3000
 Authorization: ${currentKey}
 Accept: application/json
@@ -437,8 +488,8 @@ User-Agent: SearchServiceClient/1.0`}
 
           <pre className="p-4 rounded-lg bg-slate-950 text-slate-200 font-mono text-xs overflow-x-auto leading-relaxed border border-slate-900">
             {activeLang === "curl" && `curl -H "Authorization: ${currentKey}" \\
-  "http://localhost:3000/search?q=${encodeURIComponent(query)}"`}
-            {activeLang === "fetch" && `const response = await fetch("http://localhost:3000/search?q=${encodeURIComponent(query)}", {
+  "http://localhost:3000/search${endpointQueryString}"`}
+            {activeLang === "fetch" && `const response = await fetch("http://localhost:3000/search${endpointQueryString}", {
   headers: {
     "Authorization": "${currentKey}",
     "Accept": "application/json"
@@ -449,7 +500,7 @@ console.log(documents);`}
             {activeLang === "python" && `import requests
 
 url = "http://localhost:3000/search"
-params = {"q": "${query}"}
+params = ${JSON.stringify(Object.fromEntries(new URLSearchParams(endpointQueryString.replace(/^\?/, ""))))}
 headers = {"Authorization": "${currentKey}"}
 
 response = requests.get(url, params=params, headers=headers)

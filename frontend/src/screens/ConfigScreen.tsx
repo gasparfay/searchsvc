@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import { useApp } from "@/context/AppContext";
 
 export default function ConfigScreen() {
   const { account, regenerateApiKey, updateAccount } = useApp();
+
+  const keyInputRef = useRef<HTMLInputElement>(null);
 
   const [copiado, setCopiado] = useState(false);
   const [copiadoCurl, setCopiadoCurl] = useState(false);
@@ -13,42 +15,97 @@ export default function ConfigScreen() {
   const [guardado, setGuardado] = useState(false);
   const [showRegenerateConfirm, setShowRegenerateConfirm] = useState(false);
 
-  const copyToClipboard = async (text: string) => {
-    try {
-      if (typeof navigator !== "undefined" && navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(text);
-        return true;
-      }
-    } catch {
-      // ignore and try fallback
-    }
-
-    try {
-      const textarea = document.createElement("textarea");
-      textarea.value = text;
-      textarea.style.position = "fixed";
-      textarea.style.left = "-9999px";
-      textarea.style.top = "-9999px";
-      textarea.setAttribute("readonly", "");
-      document.body.appendChild(textarea);
-      textarea.select();
-      const successful = document.execCommand("copy");
-      document.body.removeChild(textarea);
-      return successful;
-    } catch {
-      return false;
-    }
-  };
-
   async function copiar() {
-    await copyToClipboard(account.apiKey);
+    let success = false;
+
+    // 1. Primary fallback: directly select and copy via existing DOM input ref
+    if (keyInputRef.current) {
+      try {
+        keyInputRef.current.focus();
+        keyInputRef.current.select();
+        keyInputRef.current.setSelectionRange(0, account.apiKey.length);
+        success = document.execCommand("copy");
+      } catch {
+        // continue
+      }
+    }
+
+    // 2. Also execute modern navigator.clipboard
+    if (typeof navigator !== "undefined" && navigator.clipboard && navigator.clipboard.writeText) {
+      try {
+        await navigator.clipboard.writeText(account.apiKey);
+        success = true;
+      } catch {
+        // continue
+      }
+    }
+
+    // 3. Fallback: temporary visible textarea without readonly attribute
+    if (!success) {
+      try {
+        const textarea = document.createElement("textarea");
+        textarea.value = account.apiKey;
+        textarea.style.position = "fixed";
+        textarea.style.top = "0";
+        textarea.style.left = "0";
+        textarea.style.width = "2em";
+        textarea.style.height = "2em";
+        textarea.style.padding = "0";
+        textarea.style.border = "none";
+        textarea.style.outline = "none";
+        textarea.style.boxShadow = "none";
+        textarea.style.background = "transparent";
+        textarea.style.opacity = "0.01";
+        textarea.style.zIndex = "99999";
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        textarea.setSelectionRange(0, account.apiKey.length);
+        success = document.execCommand("copy");
+        document.body.removeChild(textarea);
+      } catch {
+        // continue
+      }
+    }
+
+    // Unfocus input to restore standard appearance
+    if (keyInputRef.current) {
+      keyInputRef.current.blur();
+    }
+
     setCopiado(true);
     setTimeout(() => setCopiado(false), 2000);
   }
 
   async function copiarCurl() {
     const curlCmd = `curl -H "Authorization: ${account.apiKey}" "http://localhost:3000/search?q=palabra1+palabra2"`;
-    await copyToClipboard(curlCmd);
+    let success = false;
+    if (typeof navigator !== "undefined" && navigator.clipboard && navigator.clipboard.writeText) {
+      try {
+        await navigator.clipboard.writeText(curlCmd);
+        success = true;
+      } catch {
+        // continue
+      }
+    }
+    if (!success) {
+      try {
+        const textarea = document.createElement("textarea");
+        textarea.value = curlCmd;
+        textarea.style.position = "fixed";
+        textarea.style.top = "0";
+        textarea.style.left = "0";
+        textarea.style.opacity = "0.01";
+        textarea.style.zIndex = "99999";
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      } catch {
+        // continue
+      }
+    }
     setCopiadoCurl(true);
     setTimeout(() => setCopiadoCurl(false), 2000);
   }
@@ -90,16 +147,23 @@ export default function ConfigScreen() {
 
           <div className="px-6 py-5 flex items-center justify-between gap-4">
             <div className="flex-1 min-w-0">
-              <div className="text-xs text-slate-400 mb-1">Clave de Autorización:</div>
-              <div className="text-sm font-bold tracking-wider font-mono text-emerald-400 truncate select-all">
-                {account.apiKey}
-              </div>
+              <label htmlFor="apiKeyInput" className="block text-xs text-slate-400 mb-1.5 font-medium">
+                Clave de Autorización:
+              </label>
+              <input
+                id="apiKeyInput"
+                ref={keyInputRef}
+                type="text"
+                readOnly
+                value={account.apiKey}
+                className="w-full bg-slate-950/80 border border-slate-800 rounded-lg px-3.5 py-2 text-sm font-bold font-mono tracking-wider text-emerald-400 focus:outline-none focus:border-emerald-500/50 select-all cursor-text"
+              />
             </div>
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-2 shrink-0 self-end mb-0.5">
               <button
                 type="button"
                 onClick={copiar}
-                className="px-4 py-2 text-xs font-bold rounded-lg transition-all inline-flex items-center gap-1.5"
+                className="px-4 py-2 text-xs font-bold rounded-lg transition-all inline-flex items-center gap-1.5 shadow-xs"
                 style={{ background: copiado ? "#2bc971" : "#3ddc84", color: "#0a1f14" }}
               >
                 {copiado ? (
@@ -107,7 +171,7 @@ export default function ConfigScreen() {
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
                       <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
-                    Copiado
+                    Copiado!
                   </>
                 ) : (
                   <>
