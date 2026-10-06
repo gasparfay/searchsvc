@@ -7,14 +7,49 @@ export default function ConfigScreen() {
   const { account, regenerateApiKey, updateAccount } = useApp();
 
   const [copiado, setCopiado] = useState(false);
+  const [copiadoCurl, setCopiadoCurl] = useState(false);
   const [nombre, setNombre] = useState(account.name);
   const [guardado, setGuardado] = useState(false);
   const [showRegenerateConfirm, setShowRegenerateConfirm] = useState(false);
 
-  function copiar() {
-    navigator.clipboard?.writeText(account.apiKey);
+  const copyToClipboard = async (text: string) => {
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch {
+      // ignore and try fallback
+    }
+
+    try {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      textarea.style.top = "-9999px";
+      textarea.setAttribute("readonly", "");
+      document.body.appendChild(textarea);
+      textarea.select();
+      const successful = document.execCommand("copy");
+      document.body.removeChild(textarea);
+      return successful;
+    } catch {
+      return false;
+    }
+  };
+
+  async function copiar() {
+    await copyToClipboard(account.apiKey);
     setCopiado(true);
     setTimeout(() => setCopiado(false), 2000);
+  }
+
+  async function copiarCurl() {
+    const curlCmd = `curl -H "Authorization: ${account.apiKey}" "http://localhost:3000/search?q=palabra1+palabra2"`;
+    await copyToClipboard(curlCmd);
+    setCopiadoCurl(true);
+    setTimeout(() => setCopiadoCurl(false), 2000);
   }
 
   function handleGuardar(e: React.FormEvent) {
@@ -54,10 +89,18 @@ export default function ConfigScreen() {
 
           <div className="px-6 py-5 flex items-center justify-between gap-4">
             <div className="flex-1 min-w-0">
-              <div className="text-xs text-slate-400 mb-1">Clave de Autorización:</div>
-              <div className="text-sm font-bold tracking-wider font-mono text-emerald-400 truncate">
-                {account.apiKey}
+              <div className="text-xs text-slate-400 mb-1 flex items-center gap-2">
+                <span>Clave de Autorización:</span>
+                <span className="text-[10px] text-slate-400 font-normal">(Haz clic sobre la clave para copiar)</span>
               </div>
+              <button
+                type="button"
+                onClick={copiar}
+                title="Haz clic para copiar la API Key"
+                className="text-sm font-bold tracking-wider font-mono text-emerald-400 truncate text-left hover:text-emerald-300 transition-colors block w-full focus:outline-none"
+              >
+                {account.apiKey}
+              </button>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <button
@@ -99,7 +142,20 @@ export default function ConfigScreen() {
 
           {/* Ejemplo de cURL */}
           <div className="px-6 py-3.5 bg-slate-950/60 border-t border-slate-900 text-xs font-mono text-slate-400">
-            <div className="text-[11px] text-slate-400 mb-1">Ejemplo de consumo del endpoint (Search Service Spec):</div>
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[11px] text-slate-400">Ejemplo de consumo del endpoint (Search Service Spec):</span>
+              <button
+                type="button"
+                onClick={copiarCurl}
+                className="text-[11px] text-slate-300 hover:text-white transition-colors inline-flex items-center gap-1 font-mono"
+              >
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
+                  <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+                {copiadoCurl ? "Copiado!" : "Copiar cURL"}
+              </button>
+            </div>
             <div className="text-slate-300 select-all overflow-x-auto py-1">
               curl -H &quot;Authorization: {account.apiKey}&quot; &quot;http://localhost:3000/search?q=palabra1+palabra2&quot;
             </div>
