@@ -20,22 +20,6 @@ const IconMonitor = () => (
   </svg>
 );
 
-const IconSearch = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.8" />
-    <line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-  </svg>
-);
-
-const IconDocs = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="1.8" />
-    <polyline points="14,2 14,8 20,8" stroke="currentColor" strokeWidth="1.8" />
-    <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-    <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-  </svg>
-);
-
 const IconConfig = () => (
   <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
     <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
@@ -43,21 +27,10 @@ const IconConfig = () => (
   </svg>
 );
 
-const IconMap = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <polygon points="3,6 9,3 15,6 21,3 21,18 15,21 9,18 3,21" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-    <line x1="9" y1="3" x2="9" y2="18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-    <line x1="15" y1="6" x2="15" y2="21" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-  </svg>
-);
-
 const NAV = [
-  { id: "dashboard", label: "Mis Sitios",        Icon: IconSites   },
-  { id: "monitor",   label: "Monitoreo",         Icon: IconMonitor },
-  { id: "search",    label: "Búsqueda (API)",    Icon: IconSearch  },
-  { id: "explorer",  label: "Explorador Docs",   Icon: IconDocs    },
-  { id: "config",    label: "Configuración",     Icon: IconConfig  },
-  { id: "navmap",    label: "Mapa del Sistema",  Icon: IconMap     },
+  { id: "dashboard", label: "Mis Sitios",    Icon: IconSites   },
+  { id: "monitor",   label: "Monitoreo",     Icon: IconMonitor },
+  { id: "config",    label: "Configuración", Icon: IconConfig  },
 ] as const;
 
 export default function Sidebar({ current, onNavigate }: {
