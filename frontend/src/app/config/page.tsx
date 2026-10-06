@@ -9,6 +9,8 @@ import PageContainer from "@/components/PageContainer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import {
   Card,
   CardHeader,
@@ -153,10 +155,10 @@ export default function ConfigPage() {
 
         <CardContent className="p-6 space-y-4">
           <div className="flex items-center justify-between gap-4 flex-wrap sm:flex-nowrap">
-            <div className="flex-1 min-w-0">
-              <label htmlFor="apiKeyInput" className="block text-xs text-slate-400 mb-1.5 font-medium">
+            <div className="flex-1 min-w-0 space-y-1.5">
+              <Label htmlFor="apiKeyInput" className="text-xs text-slate-400 font-medium">
                 Clave de Autorización:
-              </label>
+              </Label>
               <Input
                 id="apiKeyInput"
                 ref={keyInputRef}
@@ -198,9 +200,11 @@ export default function ConfigPage() {
           </div>
         </CardContent>
 
+        <Separator className="bg-slate-900" />
+
         {/* Ejemplo de cURL */}
-        <div className="px-6 py-3.5 bg-slate-950/60 border-t border-slate-900 text-xs font-mono text-slate-400">
-          <div className="flex items-center justify-between mb-1.5 flex-wrap gap-2">
+        <CardFooter className="px-6 py-3.5 bg-slate-950/60 border-t-0 text-xs font-mono text-slate-400 flex-col items-stretch gap-2">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <span className="text-[11px] text-slate-400">Ejemplo de consumo del endpoint (Search Service Spec):</span>
             <div className="flex items-center gap-3">
               <Link
@@ -209,20 +213,22 @@ export default function ConfigPage() {
               >
                 Probar en Playground →
               </Link>
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="sm"
                 onClick={copiarCurl}
-                className="text-[11px] text-slate-300 hover:text-white transition-colors inline-flex items-center gap-1 font-mono cursor-pointer"
+                className="text-[11px] text-slate-300 hover:text-white h-auto p-1 font-mono hover:bg-slate-900"
               >
                 {copiadoCurl ? <IconCheck /> : <IconCopy />}
                 {copiadoCurl ? "Copiado!" : "Copiar cURL"}
-              </button>
+              </Button>
             </div>
           </div>
           <div className="text-slate-300 select-all overflow-x-auto py-1">
             curl -H &quot;Authorization: {account.apiKey}&quot; &quot;http://localhost:3000/search?q=palabra1+palabra2&quot;
           </div>
-        </div>
+        </CardFooter>
       </Card>
 
       {/* Modal de confirmación para regenerar API Key */}
@@ -249,15 +255,17 @@ export default function ConfigPage() {
                 Información general asociada al titular de la cuenta y sus accesos SSO.
               </CardDescription>
             </div>
-            <span className="text-xs font-mono text-slate-400">ObjectId: {account._id}</span>
+            <Badge variant="outline" className="font-mono text-xs">
+              ObjectId: {account._id}
+            </Badge>
           </CardHeader>
 
           <CardContent className="p-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div>
-                <label htmlFor="accountNameInput" className="block text-xs font-medium text-slate-600 mb-2">
+              <div className="space-y-2">
+                <Label htmlFor="accountNameInput" className="text-slate-600">
                   NOMBRE DEL TITULAR
-                </label>
+                </Label>
                 <Input
                   id="accountNameInput"
                   type="text"
@@ -267,14 +275,14 @@ export default function ConfigPage() {
                   className="py-2.5 text-sm bg-slate-50 border-slate-200 text-slate-900 focus:bg-white"
                 />
               </div>
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label htmlFor="accountEmailInput" className="text-xs font-medium text-slate-600">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="accountEmailInput" className="text-slate-600">
                     EMAIL REGISTRADO
-                  </label>
-                  <span className="text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded font-mono">
+                  </Label>
+                  <Badge variant="secondary" className="text-[10px] font-mono px-2 py-0.5">
                     No editable (SSO)
-                  </span>
+                  </Badge>
                 </div>
                 <Input
                   id="accountEmailInput"
@@ -289,14 +297,16 @@ export default function ConfigPage() {
             </div>
           </CardContent>
 
+          <Separator />
+
           {/* Autenticación SSO */}
-          <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+          <div className="px-6 py-4 bg-slate-50/70 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs">
                 G
               </div>
               <div>
-                <div className="text-xs font-medium text-slate-800">Autenticación Single Sign-On (Auth0)</div>
+                <Label className="text-xs font-medium text-slate-800">Autenticación Single Sign-On (Auth0)</Label>
                 <div className="text-xs text-slate-500 font-mono">auth0Id: {account.auth0Id || "Sin vincular"}</div>
               </div>
             </div>
@@ -305,7 +315,7 @@ export default function ConfigPage() {
             </Badge>
           </div>
 
-          <CardFooter className="justify-end">
+          <CardFooter className="justify-end border-t border-slate-100">
             <Button type="submit">
               {guardado ? (
                 <>

@@ -9,10 +9,20 @@ import PageContainer from "@/components/PageContainer";
 import SearchResultCard from "@/components/SearchResultCard";
 import CodeBlock from "@/components/CodeBlock";
 import EmptyState from "@/components/EmptyState";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 const PRESET_QUERIES = ["catalogo", "productos", "soporte", "hardware", "contacto", "garantia"];
 
@@ -200,61 +210,69 @@ db.documents.find(${JSON.stringify(filter, null, 2)});`;
             </CardTitle>
           </div>
           <div className="flex items-center gap-2 text-xs">
-            <span className="text-slate-400">URL del Endpoint:</span>
-            <span className="font-mono text-emerald-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
+            <Label className="text-slate-400 text-xs font-normal">URL del Endpoint:</Label>
+            <Badge variant="outline" className="font-mono text-emerald-400 bg-slate-900 border-slate-800 text-xs py-0.5 px-2">
               {fullEndpointUrl}
-            </span>
+            </Badge>
           </div>
         </CardHeader>
 
         <CardContent className="p-6 space-y-4">
           {/* Selector de Ámbito de Búsqueda */}
-          <div className="flex items-center justify-between gap-4 flex-wrap text-xs bg-slate-900/80 p-3 rounded-lg border border-slate-800">
-            <div className="flex items-center gap-2.5">
-              <span className="text-slate-300 font-medium">Ámbito de búsqueda:</span>
-              <select
-                value={selectedSiteId}
-                onChange={(e) => handleSiteChange(e.target.value)}
-                className="bg-slate-950 border border-slate-700 text-emerald-400 text-xs rounded-md px-3 py-1.5 focus:outline-none focus:border-emerald-500 font-mono cursor-pointer"
-              >
-                <option value="all">Global (todos los sitios de la cuenta - Spec PDF)</option>
-                {sites.map((s) => (
-                  <option key={s._id} value={s._id}>
-                    Filtrar por sitio: {s.name} ({s._id})
-                  </option>
-                ))}
-              </select>
+          <div className="flex items-center justify-between gap-4 flex-wrap bg-slate-900/80 p-3.5 rounded-lg border border-slate-800">
+            <div className="flex items-center gap-3">
+              <Label htmlFor="siteScopeSelect" className="text-slate-300 font-medium text-xs whitespace-nowrap">
+                Ámbito de búsqueda:
+              </Label>
+              <div className="w-72">
+                <Select
+                  id="siteScopeSelect"
+                  value={selectedSiteId}
+                  onChange={(e) => handleSiteChange(e.target.value)}
+                  className="bg-slate-950 border-slate-700 text-emerald-400 font-mono"
+                >
+                  <option value="all">Global (todos los sitios de la cuenta - Spec PDF)</option>
+                  {sites.map((s) => (
+                    <option key={s._id} value={s._id}>
+                      Filtrar por sitio: {s.name} ({s._id})
+                    </option>
+                  ))}
+                </Select>
+              </div>
             </div>
-            <div className="text-[11px] text-slate-400 font-mono">
+            <div>
               {selectedSiteId === "all" ? (
-                <span className="text-emerald-400/90">Búsqueda global con API Key (sin parámetro &siteId)</span>
+                <Badge variant="outline" className="bg-emerald-950/50 text-emerald-400 border-emerald-800 font-mono text-[11px]">
+                  Búsqueda global con API Key (sin parámetro &amp;siteId)
+                </Badge>
               ) : (
-                <span>Filtro activo en URL: <code className="text-emerald-400 font-bold">&amp;siteId={selectedSiteId}</code></span>
+                <Badge variant="outline" className="bg-emerald-950 text-emerald-400 border-emerald-700 font-mono text-[11px]">
+                  Filtro activo: &amp;siteId={selectedSiteId}
+                </Badge>
               )}
             </div>
           </div>
 
           {/* Barra de URL Unificada y Continua (GET) */}
-          <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 flex items-center justify-between gap-3 flex-wrap">
-            <div className="flex items-center gap-1.5 flex-1 min-w-0 font-mono text-xs overflow-x-auto py-1">
+          <div className="bg-slate-950 p-3.5 rounded-lg border border-slate-800 flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center gap-2 flex-1 min-w-0 font-mono text-xs overflow-x-auto py-1">
               <Badge variant="outline" className="bg-emerald-500/20 text-emerald-400 font-bold shrink-0 border-emerald-500/30">
                 GET
               </Badge>
               <span className="text-slate-500 shrink-0">http://localhost:3000/search?q=</span>
-              <input
+              <Input
                 type="text"
                 value={query}
                 onChange={(e) => handleQueryChange(e.target.value)}
                 placeholder="palabras-clave"
-                className="bg-slate-900 text-emerald-300 font-mono font-bold focus:outline-none px-2 py-0.5 rounded border border-slate-700 focus:border-emerald-500 shrink-0"
-                style={{ width: `${Math.max(query.length + 2, 12)}ch` }}
+                className="w-48 bg-slate-900 text-emerald-300 border-slate-700 font-mono font-bold focus:border-emerald-500 h-8 text-xs shrink-0"
               />
               {selectedSiteId !== "all" ? (
-                <span className="text-emerald-400 font-bold bg-emerald-950 px-2 py-0.5 rounded border border-emerald-700 shrink-0">
+                <Badge variant="outline" className="bg-emerald-950 text-emerald-400 font-bold border-emerald-700 shrink-0">
                   &amp;siteId={selectedSiteId}
-                </span>
+                </Badge>
               ) : (
-                <span className="text-slate-600 text-[11px] italic ml-1 shrink-0">
+                <span className="text-slate-600 text-[11px] italic shrink-0">
                   &amp;siteId=&lt;global&gt;
                 </span>
               )}
@@ -274,39 +292,45 @@ db.documents.find(${JSON.stringify(filter, null, 2)});`;
           </div>
 
           {/* Presets de búsqueda rápida */}
-          <div className="flex items-center gap-2 text-xs flex-wrap">
-            <span className="text-slate-500 text-[11px]">Sugerencias de búsqueda:</span>
+          <div className="flex items-center gap-2 flex-wrap">
+            <Label className="text-slate-400 text-xs">Sugerencias de búsqueda:</Label>
             {PRESET_QUERIES.map((preset) => (
-              <button
+              <Button
                 key={preset}
                 type="button"
+                size="sm"
+                variant={query === preset ? "default" : "outline"}
                 onClick={() => handleQueryChange(preset)}
-                className={`px-2 py-0.5 rounded text-[11px] font-mono transition-colors cursor-pointer ${
+                className={
                   query === preset
-                    ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
-                    : "bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800"
-                }`}
+                    ? "h-7 text-xs font-mono"
+                    : "h-7 text-xs font-mono bg-slate-900 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800"
+                }
               >
                 {preset}
-              </button>
+              </Button>
             ))}
           </div>
 
           {/* Authorization Header info */}
-          <div className="pt-3 border-t border-slate-900 flex items-center justify-between gap-4 flex-wrap text-xs">
-            <div className="flex items-center gap-2 flex-1 min-w-0">
-              <span className="text-slate-500">Header Authorization:</span>
+          <Separator className="bg-slate-800" />
+          <div className="flex items-center justify-between gap-4 flex-wrap text-xs">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <Label htmlFor="customApiKeyInput" className="text-slate-400 text-xs shrink-0">
+                Header Authorization:
+              </Label>
               {!useCustomKey ? (
                 <span className="font-mono text-emerald-400 truncate">
                   {account.apiKey}
                 </span>
               ) : (
                 <Input
+                  id="customApiKeyInput"
                   type="text"
                   value={customApiKey}
                   onChange={(e) => setCustomApiKey(e.target.value)}
                   placeholder="Probar otra API Key..."
-                  className="max-w-sm bg-slate-900 border-slate-700 text-emerald-400 font-mono focus:bg-slate-900"
+                  className="max-w-sm h-8 bg-slate-900 border-slate-700 text-emerald-400 font-mono focus:bg-slate-900 text-xs"
                 />
               )}
               <Badge variant={isAuthorized ? "success" : "destructive"}>
@@ -314,79 +338,52 @@ db.documents.find(${JSON.stringify(filter, null, 2)});`;
               </Badge>
             </div>
 
-            <button
+            <Button
               type="button"
+              variant="link"
+              size="sm"
               onClick={() => {
                 setUseCustomKey(!useCustomKey);
                 if (useCustomKey) setCustomApiKey(account.apiKey);
               }}
-              className="text-xs text-slate-400 hover:text-slate-200 underline font-mono cursor-pointer"
+              className="text-xs text-slate-400 hover:text-slate-200 font-mono p-0 h-auto"
             >
               {useCustomKey ? "Usar clave de mi cuenta" : "Simular otra clave (probar 401)"}
-            </button>
+            </Button>
           </div>
         </CardContent>
       </Card>
 
       {/* Panel 2: Respuesta de la API */}
       <Card className="mb-6">
-        <CardHeader className="flex-row items-center justify-between p-4 px-6 border-b border-slate-100 flex-wrap gap-3">
-          <div className="flex items-center gap-3">
-            <Badge variant={isAuthorized ? "success" : "destructive"} className="font-mono text-xs">
-              {isAuthorized ? "HTTP 200 OK" : "HTTP 401 Unauthorized"}
-            </Badge>
-            <span className="text-xs text-slate-500">
-              Latencia: <strong className="text-slate-800 font-mono">{isAuthorized ? "24 ms" : "3 ms"}</strong>
-            </span>
-            <span className="text-slate-300">·</span>
-            <span className="text-xs text-slate-500">
-              Documentos encontrados: <strong className="text-emerald-700 font-mono">{searchResults.length}</strong>
-            </span>
-          </div>
+        <Tabs
+          value={activeTab}
+          onValueChange={(val) => setActiveTab(val as "cards" | "json" | "headers" | "mongo")}
+        >
+          <CardHeader className="flex-row items-center justify-between p-4 px-6 border-b border-slate-100 flex-wrap gap-3">
+            <div className="flex items-center gap-3">
+              <Badge variant={isAuthorized ? "success" : "destructive"} className="font-mono text-xs">
+                {isAuthorized ? "HTTP 200 OK" : "HTTP 401 Unauthorized"}
+              </Badge>
+              <span className="text-xs text-slate-500">
+                Latencia: <strong className="text-slate-800 font-mono">{isAuthorized ? "24 ms" : "3 ms"}</strong>
+              </span>
+              <span className="text-slate-300">·</span>
+              <span className="text-xs text-slate-500">
+                Documentos encontrados: <strong className="text-emerald-700 font-mono">{searchResults.length}</strong>
+              </span>
+            </div>
 
-          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
-            <button
-              type="button"
-              onClick={() => setActiveTab("cards")}
-              className={`px-3 py-1 text-xs font-semibold rounded transition-colors cursor-pointer ${
-                activeTab === "cards" ? "bg-white text-slate-900 shadow-xs" : "text-slate-500 hover:text-slate-800"
-              }`}
-            >
-              Tarjetas ({searchResults.length})
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("json")}
-              className={`px-3 py-1 text-xs font-semibold rounded transition-colors cursor-pointer ${
-                activeTab === "json" ? "bg-white text-slate-900 shadow-xs" : "text-slate-500 hover:text-slate-800"
-              }`}
-            >
-              JSON Raw
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("headers")}
-              className={`px-3 py-1 text-xs font-semibold rounded transition-colors cursor-pointer ${
-                activeTab === "headers" ? "bg-white text-slate-900 shadow-xs" : "text-slate-500 hover:text-slate-800"
-              }`}
-            >
-              Raw HTTP Request
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("mongo")}
-              className={`px-3 py-1 text-xs font-semibold rounded transition-colors cursor-pointer ${
-                activeTab === "mongo" ? "bg-white text-emerald-800 font-bold shadow-xs border border-emerald-200" : "text-slate-500 hover:text-slate-800"
-              }`}
-            >
-              MongoDB Query ($text)
-            </button>
-          </div>
-        </CardHeader>
+            <TabsList>
+              <TabsTrigger value="cards">Tarjetas ({searchResults.length})</TabsTrigger>
+              <TabsTrigger value="json">JSON Raw</TabsTrigger>
+              <TabsTrigger value="headers">Raw HTTP Request</TabsTrigger>
+              <TabsTrigger value="mongo">MongoDB Query ($text)</TabsTrigger>
+            </TabsList>
+          </CardHeader>
 
-        <CardContent className="p-6">
-          {activeTab === "cards" && (
-            <div>
+          <CardContent className="p-6">
+            <TabsContent value="cards" className="mt-0">
               {!isAuthorized ? (
                 <EmptyState
                   title="401 Unauthorized"
@@ -431,65 +428,70 @@ db.documents.find(${JSON.stringify(filter, null, 2)});`;
                   })}
                 </div>
               )}
-            </div>
-          )}
+            </TabsContent>
 
-          {activeTab === "json" && (
-            <CodeBlock
-              title="Content-Type: application/json; charset=utf-8"
-              content={jsonString}
-            />
-          )}
-
-          {activeTab === "headers" && (
-            <CodeBlock
-              title="Petición HTTP en formato estándar (Search Service Spec)"
-              content={rawHttpRequestString}
-            />
-          )}
-
-          {activeTab === "mongo" && (
-            <div>
+            <TabsContent value="json" className="mt-0">
               <CodeBlock
-                title="Sintaxis de consulta MongoDB con índice de texto ($text)"
-                content={mongoQueryString}
+                title="Content-Type: application/json; charset=utf-8"
+                content={jsonString}
               />
-              <div className="mt-4 p-3.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-600 leading-relaxed">
-                <span className="font-bold text-slate-800">Nota del enunciado (Search Service Spec):</span> En MongoDB, el operador <code className="bg-slate-200 px-1 py-0.5 rounded font-mono font-bold">$text</code> permite búsquedas de texto indexadas con tokenización y stemming sobre los campos indexados (<code>name</code>, <code>description</code>, <code>content</code>), filtrando además por la cuenta del usuario (<code>accountId</code>) y opcionalmente por el sitio (<code>siteId</code>).
+            </TabsContent>
+
+            <TabsContent value="headers" className="mt-0">
+              <CodeBlock
+                title="Petición HTTP en formato estándar (Search Service Spec)"
+                content={rawHttpRequestString}
+              />
+            </TabsContent>
+
+            <TabsContent value="mongo" className="mt-0">
+              <div>
+                <CodeBlock
+                  title="Sintaxis de consulta MongoDB con índice de texto ($text)"
+                  content={mongoQueryString}
+                />
+                <div className="mt-4 p-3.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-600 leading-relaxed">
+                  <span className="font-bold text-slate-800">Nota del enunciado (Search Service Spec):</span> En MongoDB, el operador <code className="bg-slate-200 px-1 py-0.5 rounded font-mono font-bold">$text</code> permite búsquedas de texto indexadas con tokenización y stemming sobre los campos indexados (<code>name</code>, <code>description</code>, <code>content</code>), filtrando además por la cuenta del usuario (<code>accountId</code>) y opcionalmente por el sitio (<code>siteId</code>).
+                </div>
               </div>
-            </div>
-          )}
-        </CardContent>
+            </TabsContent>
+          </CardContent>
+        </Tabs>
       </Card>
 
       {/* Panel 3: Guía de integración en clientes */}
       <Card className="p-6">
-        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-          <div>
-            <CardTitle className="text-sm font-bold text-slate-900">
-              Integración en otras aplicaciones (Search Service Spec)
-            </CardTitle>
-            <CardDescription className="mt-0.5">
-              Copiá el snippet correspondiente al lenguaje o herramienta con la que consumirás este microservicio:
-            </CardDescription>
-          </div>
-          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
-            {(["curl", "fetch", "python"] as const).map((lang) => (
-              <button
-                key={lang}
-                type="button"
-                onClick={() => setActiveLang(lang)}
-                className={`px-3 py-1 text-xs font-semibold rounded uppercase font-mono transition-colors cursor-pointer ${
-                  activeLang === lang ? "bg-white text-slate-900 shadow-xs" : "text-slate-500 hover:text-slate-800"
-                }`}
-              >
-                {lang}
-              </button>
-            ))}
-          </div>
-        </div>
+        <Tabs
+          value={activeLang}
+          onValueChange={(val) => setActiveLang(val as "curl" | "fetch" | "python")}
+        >
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <div>
+              <CardTitle className="text-sm font-bold text-slate-900">
+                Integración en otras aplicaciones (Search Service Spec)
+              </CardTitle>
+              <CardDescription className="mt-0.5">
+                Copiá el snippet correspondiente al lenguaje o herramienta con la que consumirás este microservicio:
+              </CardDescription>
+            </div>
 
-        <CodeBlock content={clientSnippet} />
+            <TabsList>
+              <TabsTrigger value="curl" className="uppercase font-mono">cURL</TabsTrigger>
+              <TabsTrigger value="fetch" className="uppercase font-mono">Fetch</TabsTrigger>
+              <TabsTrigger value="python" className="uppercase font-mono">Python</TabsTrigger>
+            </TabsList>
+          </div>
+
+          <TabsContent value="curl" className="mt-0">
+            <CodeBlock content={clientSnippet} />
+          </TabsContent>
+          <TabsContent value="fetch" className="mt-0">
+            <CodeBlock content={clientSnippet} />
+          </TabsContent>
+          <TabsContent value="python" className="mt-0">
+            <CodeBlock content={clientSnippet} />
+          </TabsContent>
+        </Tabs>
       </Card>
     </PageContainer>
   );
