@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useApp } from "@/context/AppContext";
 import PageContainer from "@/components/PageContainer";
 import PageHeader from "@/components/PageHeader";
-import StatCard from "@/components/StatCard";
+import SitesStats from "@/components/SitesStats";
 import { Button } from "@/components/ui/button";
 import SiteTable from "@/components/SiteTable";
 import ConfirmModal from "@/components/ConfirmModal";
@@ -16,10 +16,6 @@ export default function SitesPage() {
   const [siteToDelete, setSiteToDelete] = useState<{ id: string; name: string } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"recent" | "name" | "docs">("recent");
-
-  const totalSites = sites.length;
-  const totalDocs = sites.reduce((a, s) => a + (s.docsCount || 0), 0);
-  const totalRunsToday = jobs.filter((j) => j.inicio.includes("Hoy")).length;
 
   const filteredSites = useMemo(() => {
     let result = sites.filter((s) => {
@@ -43,51 +39,29 @@ export default function SitesPage() {
   return (
     <PageContainer>
       {/* Page Header Component */}
-        <PageHeader
-          breadcrumb="MIS SITIOS / RESUMEN"
-          title="Sitios Registrados"
-          action={
-            <Link href="/sites/new">
-              <Button size="lg">+ Registrar Nuevo Sitio</Button>
-            </Link>
-          }
-        />
+      <PageHeader
+        breadcrumb="MIS SITIOS / RESUMEN"
+        title="Sitios Registrados"
+        action={
+          <Link href="/sites/new">
+            <Button size="lg">+ Registrar Nuevo Sitio</Button>
+          </Link>
+        }
+      />
 
-        {/* Stats Widgets */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          <StatCard
-            label="Sitios registrados"
-            value={totalSites}
-            color="#166534"
-            bg="#dcfce7"
-            border="#bbf7d0"
-          />
-          <StatCard
-            label="Documentos indexados"
-            value={totalDocs.toLocaleString("es")}
-            color="#1e3a6e"
-            bg="#dbeafe"
-            border="#bfdbfe"
-          />
-          <StatCard
-            label="Corridas registradas"
-            value={totalRunsToday}
-            color="#475569"
-            bg="#f1f5f9"
-            border="#e2e8f0"
-          />
-        </div>
+      {/* Stats Widgets */}
+      <SitesStats sites={sites} jobs={jobs} />
 
-        {/* Sites Table */}
-        <SiteTable
-          sites={sites}
-          filteredSites={filteredSites}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          onRequestDelete={setSiteToDelete}
-        />
+      {/* Sites Table */}
+      <SiteTable
+        sites={sites}
+        filteredSites={filteredSites}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        sortBy={sortBy}
+        onSortChange={setSortBy}
+        onRequestDelete={setSiteToDelete}
+      />
 
       {/* Delete confirmation modal */}
       <ConfirmModal
