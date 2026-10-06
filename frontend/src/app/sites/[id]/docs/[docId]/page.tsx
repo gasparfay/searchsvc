@@ -4,6 +4,7 @@ import { use } from "react";
 import Link from "next/link";
 import { useApp } from "@/context/AppContext";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
 import {
   Card,
   CardHeader,
@@ -90,10 +91,10 @@ export default function DocumentDetailPage({
 
         <CardContent>
           {/* Description */}
-          <div>
-            <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+          <div className="space-y-2">
+            <Label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
               Descripción Extraída (OG / Meta / Párrafo)
-            </h2>
+            </Label>
             <div className="text-sm text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-lg border border-slate-100">
               {document.description || "Sin descripción extraída para este documento."}
             </div>

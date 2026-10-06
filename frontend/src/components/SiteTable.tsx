@@ -5,7 +5,9 @@ import type { Site } from "@/types";
 import { IconSites, IconEye, IconEdit, IconTrash } from "@/components/icons";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
 import {
   Table,
   TableHeader,
@@ -56,13 +58,13 @@ export default function SiteTable({
       {/* Header bar with Search and Sort */}
       <CardHeader className="flex-row items-center justify-between p-4 px-6 border-b border-slate-100 flex-wrap gap-4">
         <div className="flex items-center gap-3">
-          <div className="text-xs font-bold text-slate-900 tracking-wider">
+          <CardTitle className="text-xs uppercase tracking-wider">
             LISTADO DE SITIOS ({filteredSites.length}
             {filteredSites.length !== sites.length ? ` de ${sites.length}` : ""})
-          </div>
-          <span className="text-[11px] font-mono text-slate-400 bg-slate-100 px-2 py-0.5 rounded">
+          </CardTitle>
+          <Badge variant="outline" className="font-mono text-[10px]">
             MongoDB: sites
-          </span>
+          </Badge>
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">
@@ -77,16 +79,17 @@ export default function SiteTable({
 
           {/* Sort selector */}
           <div className="flex items-center gap-2 text-xs text-slate-500">
-            <span className="text-[11px] text-slate-400">Ordenar:</span>
-            <select
-              value={sortBy}
-              onChange={(e) => onSortChange(e.target.value as "recent" | "name" | "docs")}
-              className="px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700 focus:outline-none focus:border-emerald-400 cursor-pointer"
-            >
-              <option value="recent">Recientes</option>
-              <option value="name">Nombre A-Z</option>
-              <option value="docs">Más Documentos</option>
-            </select>
+            <Label className="text-[11px] text-slate-400 font-normal">Ordenar:</Label>
+            <div className="w-36">
+              <Select
+                value={sortBy}
+                onChange={(e) => onSortChange(e.target.value as "recent" | "name" | "docs")}
+              >
+                <option value="recent">Recientes</option>
+                <option value="name">Nombre A-Z</option>
+                <option value="docs">Más Documentos</option>
+              </Select>
+            </div>
           </div>
         </div>
       </CardHeader>
@@ -143,32 +146,33 @@ export default function SiteTable({
                 <TableCell>
                   <div className="flex items-center gap-2">
                     {/* Ver detalle */}
-                    <Link
-                      href={`/sites/${s._id}`}
-                      title="Ver snapshots y documentos"
-                      className="p-2.5 rounded transition-all inline-flex items-center justify-center text-emerald-600 bg-emerald-50 hover:bg-emerald-100"
-                    >
-                      <IconEye />
+                    <Link href={`/sites/${s._id}`} title="Ver snapshots y documentos">
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        className="text-emerald-600 bg-emerald-50 hover:bg-emerald-100 border-emerald-200 h-8 w-8"
+                      >
+                        <IconEye />
+                      </Button>
                     </Link>
 
                     {/* Editar */}
-                    <Link
-                      href={`/sites/${s._id}/edit`}
-                      title="Editar configuración del sitio"
-                      className="p-2.5 rounded transition-all inline-flex items-center justify-center text-slate-500 bg-slate-100 hover:bg-slate-200 hover:text-slate-800"
-                    >
-                      <IconEdit />
+                    <Link href={`/sites/${s._id}/edit`} title="Editar configuración del sitio">
+                      <Button size="icon" variant="secondary" className="h-8 w-8">
+                        <IconEdit />
+                      </Button>
                     </Link>
 
                     {/* Eliminar */}
-                    <button
-                      type="button"
+                    <Button
+                      size="icon"
+                      variant="destructive"
                       onClick={() => onRequestDelete({ id: s._id, name: s.name })}
                       title="Eliminar sitio"
-                      className="p-2.5 rounded transition-all inline-flex items-center justify-center text-red-500 bg-red-50 hover:bg-red-100 hover:text-red-700 cursor-pointer"
+                      className="h-8 w-8"
                     >
                       <IconTrash />
-                    </button>
+                    </Button>
                   </div>
                 </TableCell>
               </TableRow>
@@ -184,13 +188,13 @@ export default function SiteTable({
                       No se encontraron sitios que coincidan con &quot;
                       <span className="text-slate-700 font-medium">{searchQuery}</span>&quot;
                     </p>
-                    <button
-                      type="button"
+                    <Button
+                      variant="link"
+                      size="sm"
                       onClick={() => onSearchChange("")}
-                      className="text-xs text-emerald-600 font-bold hover:underline cursor-pointer"
                     >
                       Limpiar filtro de búsqueda
-                    </button>
+                    </Button>
                   </div>
                 ) : (
                   "No tienes sitios registrados. Haz clic en '+ Registrar Nuevo Sitio' para comenzar."

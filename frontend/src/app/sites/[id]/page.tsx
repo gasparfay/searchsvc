@@ -2,23 +2,19 @@
 
 import { useState, useMemo, useEffect, use } from "react";
 import { useApp } from "@/context/AppContext";
-import { IconPlay, IconTrash } from "@/components/icons";
-import { Button } from "@/components/ui/button";
+import { IconTrash } from "@/components/icons";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
-  CardContent,
 } from "@/components/ui/card";
 import PageContainer from "@/components/PageContainer";
 import SiteHeader from "@/components/SiteHeader";
 import SnapshotBar from "@/components/SnapshotBar";
-import DocumentCard from "@/components/DocumentCard";
+import SiteDocumentsPanel from "@/components/SiteDocumentsPanel";
 import ConfirmModal from "@/components/ConfirmModal";
-import EmptyState from "@/components/EmptyState";
-import SearchInput from "@/components/SearchInput";
 
 export default function SiteDetailPage({
   params,
@@ -96,7 +92,7 @@ export default function SiteDetailPage({
         onDelete={() => setShowDeleteModal(true)}
       />
 
-      {/* Panel 1: Historical Snapshots */}
+      {/* Panel 1: Snapshots Históricos */}
       <Card className="mb-6">
         <CardHeader className="flex-row items-center justify-between p-4 px-6 border-b border-slate-100 flex-wrap gap-2">
           <div>
@@ -126,54 +122,17 @@ export default function SiteDetailPage({
         </div>
       </Card>
 
-      {/* Panel 2: Documents Grid or Zero-Snapshot Empty State */}
-      {siteSnapshots.length === 0 ? (
-        <EmptyState
-          icon={<IconPlay />}
-          title="Este sitio aún no tiene documentos indexados"
-          description={`Aún no se ha realizado ninguna corrida de crawler para ${site.name}. Presioná el botón a continuación para iniciar la primera indexación.`}
-          action={
-            <Button onClick={handleTriggerCrawl}>
-              <IconPlay />
-              Iniciar Primera Indexación
-            </Button>
-          }
-        />
-      ) : (
-        <Card>
-          <CardHeader className="flex-row items-center justify-between p-4 px-6 border-b border-slate-100 flex-wrap gap-4">
-            <div>
-              <CardTitle className="text-xs uppercase tracking-wider">
-                Documentos Extraídos del Snapshot ({activeSnapshot ? activeSnapshot.id : "—"})
-              </CardTitle>
-              <CardDescription>
-                Mostrando {filteredDocs.length} de {activeDocs.length} documentos.
-              </CardDescription>
-            </div>
-
-            <SearchInput
-              value={querySearch}
-              onChange={setQuerySearch}
-              placeholder="Filtrar por título, url o descripción..."
-              className="min-w-[280px]"
-            />
-          </CardHeader>
-
-          <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredDocs.map((doc) => (
-              <DocumentCard key={doc.id} document={doc} siteId={site._id} />
-            ))}
-
-            {filteredDocs.length === 0 && (
-              <div className="col-span-full py-16 text-center text-slate-400 text-xs">
-                {activeDocs.length === 0
-                  ? "Este snapshot no tiene documentos extraídos asociados."
-                  : `Sin documentos que coincidan con "${querySearch}".`}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
+      {/* Panel 2: Documentos Extraídos */}
+      <SiteDocumentsPanel
+        site={site}
+        hasSnapshots={siteSnapshots.length > 0}
+        activeSnapshot={activeSnapshot}
+        filteredDocs={filteredDocs}
+        activeDocsCount={activeDocs.length}
+        querySearch={querySearch}
+        onQuerySearchChange={setQuerySearch}
+        onTriggerCrawl={handleTriggerCrawl}
+      />
 
       {/* Modal de confirmación para eliminar */}
       <ConfirmModal
