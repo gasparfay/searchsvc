@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useApp } from "@/context/AppContext";
 import { IconCopy, IconCheck, IconRefresh } from "@/components/icons";
 import PageHeader from "@/components/PageHeader";
-import StatusBadge from "@/components/StatusBadge";
+import { Badge } from "@/components/ui/badge";
 import ConfirmModal from "@/components/ConfirmModal";
 import { Button } from "@/components/ui/button";
 
@@ -285,9 +285,9 @@ export default function ConfigPage() {
                 <div className="text-xs text-slate-500 font-mono">auth0Id: {account.auth0Id || "Sin vincular"}</div>
               </div>
             </div>
-            <StatusBadge variant={account.auth0Id ? "success" : "neutral"}>
+            <Badge variant={account.auth0Id ? "success" : "secondary"} dot>
               {account.auth0Id ? "Vinculado con Google" : "Sin vincular a SSO"}
-            </StatusBadge>
+            </Badge>
 
           </div>
 

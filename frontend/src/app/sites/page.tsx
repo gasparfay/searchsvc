@@ -7,7 +7,8 @@ import PageHeader from "@/components/PageHeader";
 import StatCard from "@/components/StatCard";
 import { Button } from "@/components/ui/button";
 import SiteTable from "@/components/SiteTable";
-import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
+import ConfirmModal from "@/components/ConfirmModal";
+import { IconTrash } from "@/components/icons";
 
 export default function SitesPage() {
   const { sites, jobs } = useApp();
@@ -92,13 +93,23 @@ export default function SitesPage() {
       </div>
 
       {/* Delete confirmation modal */}
-      <ConfirmDeleteModal
+      <ConfirmModal
         isOpen={Boolean(siteToDelete)}
-        siteName={siteToDelete?.name || ""}
-        onConfirm={() => {
-          // Modo maquetado: decorativo
-          setSiteToDelete(null);
-        }}
+        title="¿Eliminar sitio definitivamente?"
+        icon={
+          <div className="w-9 h-9 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0">
+            <IconTrash />
+          </div>
+        }
+        description={
+          <span>
+            Se eliminará el sitio <strong className="text-slate-900 font-semibold">{siteToDelete?.name}</strong> y todos sus snapshots y documentos extraídos asociados de forma irreversible.
+          </span>
+        }
+        confirmLabel="Sí, Eliminar Sitio"
+        cancelLabel="Cancelar"
+        confirmVariant="destructive"
+        onConfirm={() => setSiteToDelete(null)}
         onCancel={() => setSiteToDelete(null)}
       />
 

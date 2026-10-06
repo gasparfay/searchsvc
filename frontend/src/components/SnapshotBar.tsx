@@ -1,4 +1,5 @@
 import type { CrawlSnapshot } from "@/types";
+import { Badge } from "@/components/ui/badge";
 
 interface SnapshotBarProps {
   snapshots: CrawlSnapshot[];
@@ -40,13 +41,12 @@ export default function SnapshotBar({
           >
             <div className="flex items-center justify-between mb-1.5">
               <span className="font-bold font-mono text-slate-900">{snap.id}</span>
-              <span
-                className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                  isOk ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"
-                }`}
+              <Badge
+                variant={isOk ? "success" : "warning"}
+                className="text-[10px] font-bold"
               >
                 {isOk ? "OK" : "Parcial"}
-              </span>
+              </Badge>
             </div>
             <div className="text-slate-600 font-medium mb-1">{snap.fecha}</div>
             <div className="flex items-center justify-between text-slate-400 text-[11px]">

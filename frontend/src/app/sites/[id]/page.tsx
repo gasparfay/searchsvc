@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import SnapshotBar from "@/components/SnapshotBar";
 import DocumentCard from "@/components/DocumentCard";
-import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
+import ConfirmModal from "@/components/ConfirmModal";
 import EmptyState from "@/components/EmptyState";
 import SearchInput from "@/components/SearchInput";
 
@@ -221,13 +221,23 @@ export default function SiteDetailPage({
       </div>
 
       {/* Delete confirmation modal */}
-      <ConfirmDeleteModal
+      <ConfirmModal
         isOpen={showDeleteModal}
-        siteName={site.name}
-        onConfirm={() => {
-          // Modo maquetado: decorativo
-          setShowDeleteModal(false);
-        }}
+        title="¿Eliminar sitio definitivamente?"
+        icon={
+          <div className="w-9 h-9 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0">
+            <IconTrash />
+          </div>
+        }
+        description={
+          <span>
+            Se eliminará el sitio <strong className="text-slate-900 font-semibold">{site.name}</strong> y todos sus snapshots y documentos extraídos asociados de forma irreversible.
+          </span>
+        }
+        confirmLabel="Sí, Eliminar Sitio"
+        cancelLabel="Cancelar"
+        confirmVariant="destructive"
+        onConfirm={() => setShowDeleteModal(false)}
         onCancel={() => setShowDeleteModal(false)}
       />
     </div>
