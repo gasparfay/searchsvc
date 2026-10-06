@@ -8,7 +8,7 @@ export const INITIAL_ACCOUNT: Account = {
   auth0Id: "google-oauth2|10928374651928374",
 };
 
-export const INITIAL_SITES: Site[] = [
+export const DEMO_SITES: Site[] = [
   {
     _id: "65f1a2b3c4d5e6f7a8b9c011",
     accountId: "65f1a2b3c4d5e6f7a8b9c001",
@@ -84,7 +84,7 @@ export const INITIAL_SITES: Site[] = [
   },
 ];
 
-export const INITIAL_SNAPSHOTS: CrawlSnapshot[] = [
+export const DEMO_SNAPSHOTS: CrawlSnapshot[] = [
   { id: "snap-019", siteId: "65f1a2b3c4d5e6f7a8b9c011", fecha: "04 sep 2026 · 09:12", docs: 1842, estado: "ok", duracion: "21m 08s", pagesVisited: 1842 },
   { id: "snap-018", siteId: "65f1a2b3c4d5e6f7a8b9c011", fecha: "04 sep 2026 · 03:12", docs: 1839, estado: "ok", duracion: "20m 44s", pagesVisited: 1839 },
   { id: "snap-017", siteId: "65f1a2b3c4d5e6f7a8b9c011", fecha: "03 sep 2026 · 21:12", docs: 1835, estado: "ok", duracion: "22m 01s", pagesVisited: 1835 },
@@ -92,7 +92,7 @@ export const INITIAL_SNAPSHOTS: CrawlSnapshot[] = [
   { id: "snap-015", siteId: "65f1a2b3c4d5e6f7a8b9c011", fecha: "03 sep 2026 · 09:12", docs: 1828, estado: "ok", duracion: "19m 55s", pagesVisited: 1828 },
 ];
 
-export const INITIAL_DOCUMENTS: ExtractedDocument[] = [
+export const DEMO_DOCUMENTS: ExtractedDocument[] = [
   // Documentos de snap-019
   {
     id: "doc-001",
@@ -236,7 +236,7 @@ export const INITIAL_DOCUMENTS: ExtractedDocument[] = [
   },
 ];
 
-export const INITIAL_JOBS: CrawlJob[] = [
+export const DEMO_JOBS: CrawlJob[] = [
   { id: "job-041", siteId: "65f1a2b3c4d5e6f7a8b9c011", sitio: "Tienda Ejemplo", inicio: "Hoy · 09:12", duracion: "21m 08s", paginas: 1842, docs: 1842, errores: 0, estado: "completado" },
   { id: "job-040", siteId: "65f1a2b3c4d5e6f7a8b9c013", sitio: "Wiki Interna", inicio: "Hoy · 08:50", duracion: "18m 44s", paginas: 3104, docs: 3098, errores: 0, estado: "completado" },
   { id: "job-039", siteId: "65f1a2b3c4d5e6f7a8b9c012", sitio: "Blog Corporativo", inicio: "Hoy · 06:00", duracion: "42m 11s", paginas: 4391, docs: 4391, errores: 0, estado: "completado" },
@@ -245,10 +245,17 @@ export const INITIAL_JOBS: CrawlJob[] = [
   { id: "job-036", siteId: "65f1a2b3c4d5e6f7a8b9c014", sitio: "Documentación Dev", inicio: "Ayer · 14:30", duracion: "9m 57s", paginas: 782, docs: 780, errores: 1, estado: "completado" },
 ];
 
-// Aliases for clean data layer separation
+// Active runtime data: initialized empty to verify dynamic empty states without hardcoded data
+export const INITIAL_SITES: Site[] = [];
+export const INITIAL_SNAPSHOTS: CrawlSnapshot[] = [];
+export const INITIAL_DOCUMENTS: ExtractedDocument[] = [];
+export const INITIAL_JOBS: CrawlJob[] = [];
+
+// Aliases
 export const MOCK_ACCOUNT = INITIAL_ACCOUNT;
 export const MOCK_SITES = INITIAL_SITES;
 export const MOCK_SNAPSHOTS = INITIAL_SNAPSHOTS;
 export const MOCK_DOCUMENTS = INITIAL_DOCUMENTS;
 export const MOCK_JOBS = INITIAL_JOBS;
+
 

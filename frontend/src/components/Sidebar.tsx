@@ -29,7 +29,7 @@ export default function Sidebar() {
     }}>
       {/* Logo */}
       <div className="px-6 pt-7 pb-6" style={{ borderBottom: "1px solid #1e2d42" }}>
-        <Link href="/sites" className="flex items-center gap-3 mb-2 group">
+        <Link href="/sites" className="flex items-center gap-3 mb-4 group">
           <div className="w-9 h-9 flex items-center justify-center shrink-0" style={{
             background: "#3ddc84",
             clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
