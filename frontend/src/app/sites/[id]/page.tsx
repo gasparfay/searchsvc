@@ -26,7 +26,18 @@ export default function SiteDetailPage({
   const router = useRouter();
   const { sites, snapshots, documents, triggerCrawl, deleteSite } = useApp();
 
-  const site = sites.find((s) => s._id === siteId) || sites[0];
+  const site = sites.find((s) => s._id === siteId) || {
+    _id: siteId || "65f1a2b3c4d5e6f7a8b9c011",
+    name: "Tienda Ejemplo",
+    url: "https://example.com",
+    maxDepth: 2,
+    frequency: "Cada 6 horas",
+    docsCount: 0,
+    lastRunDate: "Sin ejecuciones",
+    lastRunStatus: "ok" as const,
+    accountId: "65f1a2b3c4d5e6f7a8b9c001",
+    createdAt: new Date().toISOString(),
+  };
 
   const siteSnapshots = useMemo(() => {
     if (!site) return [];
@@ -68,20 +79,10 @@ export default function SiteDetailPage({
     );
   }, [activeDocs, querySearch]);
 
-  if (!site) {
-    return (
-      <div className="h-full flex flex-col items-center justify-center p-8 text-center" style={{ background: "#f0f2f6" }}>
-        <h2 className="text-lg font-bold text-slate-800 mb-2">Sitio no encontrado</h2>
-        <Link href="/sites" className="text-xs text-emerald-600 font-bold hover:underline">
-          Volver a Mis Sitios
-        </Link>
-      </div>
-    );
-  }
-
   function handleTriggerCrawl() {
     // Modo maquetado: el botón no realiza acción
   }
+
 
   return (
     <div className="h-full overflow-y-auto" style={{ background: "#f0f2f6" }}>
@@ -251,9 +252,8 @@ export default function SiteDetailPage({
         isOpen={showDeleteModal}
         siteName={site.name}
         onConfirm={() => {
-          deleteSite(site._id);
+          // Modo maquetado: decorativo
           setShowDeleteModal(false);
-          router.push("/sites");
         }}
         onCancel={() => setShowDeleteModal(false)}
       />

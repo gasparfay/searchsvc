@@ -101,13 +101,12 @@ export default function SitesPage() {
         isOpen={Boolean(siteToDelete)}
         siteName={siteToDelete?.name || ""}
         onConfirm={() => {
-          if (siteToDelete) {
-            deleteSite(siteToDelete.id);
-            setSiteToDelete(null);
-          }
+          // Modo maquetado: decorativo
+          setSiteToDelete(null);
         }}
         onCancel={() => setSiteToDelete(null)}
       />
+
     </div>
   );
 }

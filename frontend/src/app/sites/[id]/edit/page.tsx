@@ -15,24 +15,20 @@ export default function EditSitePage({
   const router = useRouter();
   const { sites, updateSite } = useApp();
 
-  const site = sites.find((s) => s._id === id);
-
-  if (!site) {
-    return (
-      <div className="h-full flex flex-col items-center justify-center p-8 text-center bg-slate-100">
-        <h2 className="text-lg font-bold text-slate-800 mb-2">Sitio no encontrado</h2>
-        <p className="text-xs text-slate-500 mb-4">
-          No se encontró ningún sitio con el identificador {id}.
-        </p>
-        <Link
-          href="/sites"
-          className="text-xs text-emerald-600 font-bold hover:underline"
-        >
-          ← Volver a Mis Sitios
-        </Link>
-      </div>
-    );
-  }
+  const site = sites.find((s) => s._id === id) || {
+    _id: id || "65f1a2b3c4d5e6f7a8b9c011",
+    name: "Tienda Ejemplo",
+    url: "https://example.com",
+    maxDepth: 2,
+    frequency: "Cada 6 horas",
+    extractorSnippet: `function extract(request, response) {\n  const $ = response.body;\n  return [{\n    name: $('title').text(),\n    url: request.url,\n    description: $('meta[name="description"]').attr('content') || $('p').first().text().slice(0, 200)\n  }];\n}`,
+    pageResolverSnippet: `function pageResolver(request, response) {\n  const $ = response.body;\n  const links = [];\n  $('a[href]').each(function() {\n    const href = $(this).attr('href');\n    if (href && href.startsWith('/')) links.push(request.baseUrl + href);\n  });\n  return links;\n}`,
+    docsCount: 0,
+    lastRunDate: "Sin ejecuciones",
+    lastRunStatus: "ok" as const,
+    accountId: "65f1a2b3c4d5e6f7a8b9c001",
+    createdAt: new Date().toISOString(),
+  };
 
   return (
     <div className="h-full overflow-y-auto bg-slate-100">
@@ -63,12 +59,12 @@ export default function EditSitePage({
           initialData={site}
           submitLabel="Guardar Cambios →"
           cancelHref={`/sites/${id}`}
-          onSubmit={(values) => {
-            updateSite(id, values);
-            router.push(`/sites/${id}`);
+          onSubmit={() => {
+            // Modo maquetado: el botón no realiza acción
           }}
         />
       </div>
     </div>
   );
+
 }

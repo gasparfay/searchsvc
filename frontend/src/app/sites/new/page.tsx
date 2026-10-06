@@ -34,11 +34,11 @@ export default function NewSitePage() {
         <SiteForm
           submitLabel="Guardar y Registrar Sitio →"
           cancelHref="/sites"
-          onSubmit={(values) => {
-            const newSite = addSite(values);
-            router.push(`/sites/${newSite._id}`);
+          onSubmit={() => {
+            // Modo maquetado: el botón no realiza acción
           }}
         />
+
       </div>
     </div>
   );

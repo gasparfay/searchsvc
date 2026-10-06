@@ -111,16 +111,16 @@ export default function ConfigPage() {
 
   function handleGuardar(e: React.FormEvent) {
     e.preventDefault();
-    updateAccount({ name: nombre.trim() });
+    // Modo maquetado: decorativo, no muta la cuenta
     setGuardado(true);
     setTimeout(() => setGuardado(false), 2500);
   }
 
   function handleRegenerar() {
-    regenerateApiKey();
+    // Modo maquetado: decorativo, cierra el modal sin regenerar
     setShowRegenerateConfirm(false);
-    setCopiado(false);
   }
+
 
   return (
     <div className="h-full overflow-y-auto bg-slate-100">

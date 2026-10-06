@@ -40,64 +40,52 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [documents, setDocuments] = useState<ExtractedDocument[]>(INITIAL_DOCUMENTS);
   const [jobs, setJobs] = useState<CrawlJob[]>(INITIAL_JOBS);
 
-  const addSite = (siteData: {
+  // Modo maquetado puramente decorativo: sin mutaciones locales que simulen el backend
+  const addSite = (_siteData: {
     name: string;
     url: string;
     maxDepth: number;
     frequency: string;
     extractorSnippet: string;
     pageResolverSnippet?: string;
-  }) => {
-    // Generate valid 24-char hex MongoDB ObjectId
-    const hexTimestamp = Math.floor(Date.now() / 1000).toString(16).padStart(8, "0");
-    const hexRandom = Math.random().toString(16).substring(2, 18).padEnd(16, "0");
-    const newId = (hexTimestamp + hexRandom).substring(0, 24);
-
-    const newSite: Site = {
-      _id: newId,
+  }): Site => {
+    return {
+      _id: "65f1a2b3c4d5e6f7a8b9c099",
       accountId: account._id,
-      name: siteData.name,
-      url: siteData.url,
-      maxDepth: siteData.maxDepth,
-      frequency: siteData.frequency,
-      extractorSnippet: siteData.extractorSnippet,
-      pageResolverSnippet: siteData.pageResolverSnippet,
+      name: _siteData.name,
+      url: _siteData.url,
+      maxDepth: _siteData.maxDepth,
+      frequency: _siteData.frequency,
+      extractorSnippet: _siteData.extractorSnippet,
+      pageResolverSnippet: _siteData.pageResolverSnippet,
       docsCount: 0,
       lastRunDate: "Sin ejecuciones previas",
       lastRunStatus: "ok",
       createdAt: new Date().toISOString(),
     };
-
-    setSites((prev) => [newSite, ...prev]);
-    return newSite;
   };
 
-  const updateSite = (id: string, siteData: Partial<Site>) => {
-    setSites((prev) =>
-      prev.map((s) => (s._id === id ? { ...s, ...siteData, updatedAt: new Date().toISOString() } : s))
-    );
+  const updateSite = (_id: string, _siteData: Partial<Site>) => {
+    // Modo maquetado: decorativo
   };
 
-  const deleteSite = (id: string) => {
-    setSites((prev) => prev.filter((s) => s._id !== id));
-    setSnapshots((prev) => prev.filter((snap) => snap.siteId !== id));
-    setDocuments((prev) => prev.filter((doc) => doc.siteId !== id));
+  const deleteSite = (_id: string) => {
+    // Modo maquetado: decorativo
   };
 
   const triggerCrawl = async (_siteId: string): Promise<void> => {
-    // Modo maquetado: sin acción hasta integración con microservicio de backend
+    // Modo maquetado: decorativo
   };
-
 
   const regenerateApiKey = (): string => {
-    const newKey = crypto.randomUUID();
-    setAccount((prev) => ({ ...prev, apiKey: newKey }));
-    return newKey;
+    // Modo maquetado: decorativo
+    return account.apiKey;
   };
 
-  const updateAccount = (data: Partial<Account>) => {
-    setAccount((prev) => ({ ...prev, ...data }));
+  const updateAccount = (_data: Partial<Account>) => {
+    // Modo maquetado: decorativo
   };
+
 
   return (
     <AppContext.Provider
