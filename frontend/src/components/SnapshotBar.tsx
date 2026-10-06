@@ -14,10 +14,11 @@ export default function SnapshotBar({
   if (snapshots.length === 0) {
     return (
       <div className="py-6 px-4 text-center rounded-lg bg-slate-50 border border-slate-100 text-xs text-slate-500">
-        No hay fotos históricas registradas para este sitio aún. Haz clic en <strong className="text-slate-700">&quot;Ejecutar Crawl Ahora&quot;</strong> para generar la primera foto.
+        No hay snapshots históricos registrados para este sitio aún.
       </div>
     );
   }
+
 
 
   return (

@@ -5,7 +5,7 @@ import { useApp } from "@/context/AppContext";
 
 const STATUS_MAP: Record<string, { label: string; dot: string; text: string; bg: string }> = {
   completado: { label: "Completado", dot: "bg-emerald-500", text: "text-emerald-800", bg: "bg-emerald-50" },
-  corriendo:  { label: "En curso",   dot: "bg-blue-500",    text: "text-blue-800",    bg: "bg-blue-50" },
+  corriendo:  { label: "En curso",   dot: "bg-amber-400",   text: "text-amber-800",   bg: "bg-amber-50" },
   error:      { label: "Error",      dot: "bg-red-500",     text: "text-red-800",     bg: "bg-red-50" },
 };
 
@@ -40,11 +40,11 @@ export default function MonitorPage() {
             </div>
             <div className="text-3xl font-bold text-emerald-950">{completedCount}</div>
           </div>
-          <div className="px-5 py-4 rounded-xl bg-sky-50 border border-sky-200">
-            <div className="text-xs mb-1.5 font-bold uppercase tracking-wider text-sky-900/70">
+          <div className="px-5 py-4 rounded-xl bg-amber-50 border border-amber-200">
+            <div className="text-xs mb-1.5 font-bold uppercase tracking-wider text-amber-900/70">
               En curso
             </div>
-            <div className="text-3xl font-bold text-sky-950">{runningCount}</div>
+            <div className="text-3xl font-bold text-amber-950">{runningCount}</div>
           </div>
           <div className="px-5 py-4 rounded-xl bg-red-50 border border-red-200">
             <div className="text-xs mb-1.5 font-bold uppercase tracking-wider text-red-900/70">

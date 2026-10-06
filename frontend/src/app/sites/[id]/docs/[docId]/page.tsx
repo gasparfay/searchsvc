@@ -151,7 +151,7 @@ export default function DocumentDetailPage({
                   <span className="font-mono text-slate-800">{document.crawledAt}</span>
                 </div>
                 <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-100">
-                  <span className="text-slate-400 block mb-1">Foto / Snapshot</span>
+                  <span className="text-slate-400 block mb-1">Snapshot</span>
                   <span className="font-mono font-semibold text-emerald-700">{document.snapshotId}</span>
                 </div>
               </div>

@@ -104,7 +104,7 @@ export default function SiteTable({
       <table className="w-full">
         <thead>
           <tr className="border-b border-slate-100 bg-slate-50/70">
-            {["Sitio / ID", "URL Base", "Profundidad", "Frecuencia", "Última Foto", "Docs", "Acciones"].map((h) => (
+            {["Sitio / ID", "URL Base", "Profundidad", "Frecuencia", "Último Snapshot", "Docs", "Acciones"].map((h) => (
               <th key={h} className="text-left px-6 py-3.5 text-xs font-medium text-slate-400 tracking-wider">
                 {h.toUpperCase()}
               </th>
@@ -146,7 +146,7 @@ export default function SiteTable({
                       }`}
                     >
                       <span className={`w-1.5 h-1.5 rounded-full ${isOk ? "bg-emerald-500" : "bg-red-500"}`} />
-                      {isOk ? "Foto OK" : "Con errores"}
+                      {isOk ? "Snapshot OK" : "Con errores"}
                     </span>
                   )}
                 </td>
@@ -158,7 +158,7 @@ export default function SiteTable({
                     {/* Ver detalle */}
                     <Link
                       href={`/sites/${s._id}`}
-                      title="Ver fotos y documentos"
+                      title="Ver snapshots y documentos"
                       className="p-2.5 rounded transition-all inline-flex items-center justify-center text-emerald-600 bg-emerald-50 hover:bg-emerald-100"
                     >
                       <IconEye />
