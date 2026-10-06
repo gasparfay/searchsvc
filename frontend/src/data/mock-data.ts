@@ -374,11 +374,11 @@ export const DEMO_JOBS: CrawlJob[] = [
   },
 ];
 
-// Active runtime data: initialized empty to verify dynamic empty states without hardcoded data
-export const INITIAL_SITES: Site[] = [];
-export const INITIAL_SNAPSHOTS: CrawlSnapshot[] = [];
-export const INITIAL_DOCUMENTS: ExtractedDocument[] = [];
-export const INITIAL_JOBS: CrawlJob[] = [];
+// Active runtime data: populated with demo mock data for schematic testing
+export const INITIAL_SITES: Site[] = DEMO_SITES;
+export const INITIAL_SNAPSHOTS: CrawlSnapshot[] = DEMO_SNAPSHOTS;
+export const INITIAL_DOCUMENTS: ExtractedDocument[] = DEMO_DOCUMENTS;
+export const INITIAL_JOBS: CrawlJob[] = DEMO_JOBS;
 
 // Aliases
 export const MOCK_ACCOUNT = INITIAL_ACCOUNT;
