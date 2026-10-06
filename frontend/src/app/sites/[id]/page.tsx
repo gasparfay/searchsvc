@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, use } from "react";
+import { useState, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useApp } from "@/context/AppContext";
@@ -30,44 +30,25 @@ export default function SiteDetailPage({
   const { sites, snapshots, documents, deleteSite, triggerCrawl } = useApp();
 
   const site = sites.find((s) => s._id === siteId);
-
-  const siteSnapshots = useMemo(() => {
-    if (!site) return [];
-    return snapshots.filter((snap) => snap.siteId === site._id);
-  }, [snapshots, site]);
+  const siteSnapshots = site ? snapshots.filter((snap) => snap.siteId === site._id) : [];
 
   const [userSelectedSnapshotId, setUserSelectedSnapshotId] = useState<string | null>(null);
-
-  const activeSnapshot = useMemo(() => {
-    if (!siteSnapshots.length) return undefined;
-    if (userSelectedSnapshotId && siteSnapshots.some((s) => s.id === userSelectedSnapshotId)) {
-      return siteSnapshots.find((s) => s.id === userSelectedSnapshotId);
-    }
-    return siteSnapshots[0];
-  }, [siteSnapshots, userSelectedSnapshotId]);
-
-  const selectedSnapshotId = activeSnapshot?.id || "";
-
   const [querySearch, setQuerySearch] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const activeDocs = useMemo(() => {
-    if (!site || !activeSnapshot) return [];
-    return documents.filter(
-      (doc) => doc.siteId === site._id && doc.snapshotId === activeSnapshot.id
-    );
-  }, [documents, site, activeSnapshot]);
+  const activeSnapshot =
+    userSelectedSnapshotId && siteSnapshots.some((s) => s.id === userSelectedSnapshotId)
+      ? siteSnapshots.find((s) => s.id === userSelectedSnapshotId)
+      : siteSnapshots[0];
 
-  const filteredDocs = useMemo(() => {
-    if (!querySearch.trim()) return activeDocs;
-    const q = querySearch.toLowerCase();
-    return activeDocs.filter(
-      (d) =>
-        d.name.toLowerCase().includes(q) ||
-        d.description.toLowerCase().includes(q) ||
-        d.url.toLowerCase().includes(q)
-    );
-  }, [activeDocs, querySearch]);
+  const selectedSnapshotId = activeSnapshot?.id || "";
+
+  // Documentos del snapshot activo (búsqueda decorativa, sin lógica de filtrado)
+  const docs = site && activeSnapshot
+    ? documents.filter(
+        (doc) => doc.siteId === site._id && doc.snapshotId === activeSnapshot.id
+      )
+    : [];
 
   if (!site) {
     return (
@@ -143,8 +124,7 @@ export default function SiteDetailPage({
         site={site}
         hasSnapshots={siteSnapshots.length > 0}
         activeSnapshot={activeSnapshot}
-        filteredDocs={filteredDocs}
-        activeDocsCount={activeDocs.length}
+        docs={docs}
         querySearch={querySearch}
         onQuerySearchChange={setQuerySearch}
         onTriggerCrawl={handleTriggerCrawl}

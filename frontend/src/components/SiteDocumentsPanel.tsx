@@ -18,8 +18,7 @@ interface SiteDocumentsPanelProps {
   site: Site;
   hasSnapshots: boolean;
   activeSnapshot?: CrawlSnapshot;
-  filteredDocs: ExtractedDocument[];
-  activeDocsCount: number;
+  docs: ExtractedDocument[];
   querySearch: string;
   onQuerySearchChange: (q: string) => void;
   onTriggerCrawl: () => void;
@@ -29,8 +28,7 @@ export default function SiteDocumentsPanel({
   site,
   hasSnapshots,
   activeSnapshot,
-  filteredDocs,
-  activeDocsCount,
+  docs,
   querySearch,
   onQuerySearchChange,
   onTriggerCrawl,
@@ -59,28 +57,27 @@ export default function SiteDocumentsPanel({
             Documentos Extraídos del Snapshot ({activeSnapshot ? activeSnapshot.id : "—"})
           </CardTitle>
           <CardDescription>
-            Mostrando {filteredDocs.length} de {activeDocsCount} documentos.
+            Mostrando {docs.length} documentos indexados.
           </CardDescription>
         </div>
 
+        {/* Barra de búsqueda decorativa (sin filtrado activo) */}
         <SearchInput
           value={querySearch}
           onChange={onQuerySearchChange}
-          placeholder="Filtrar por título, url o descripción..."
+          placeholder="Buscar por título, url o descripción..."
           className="min-w-[280px]"
         />
       </CardHeader>
 
       <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredDocs.map((doc) => (
+        {docs.map((doc) => (
           <DocumentCard key={doc.id} document={doc} siteId={site._id} />
         ))}
 
-        {filteredDocs.length === 0 && (
+        {docs.length === 0 && (
           <div className="col-span-full py-16 text-center text-slate-400 text-xs">
-            {activeDocsCount === 0
-              ? "Este snapshot no tiene documentos extraídos asociados."
-              : `Sin documentos que coincidan con "${querySearch}".`}
+            Este snapshot no tiene documentos extraídos asociados.
           </div>
         )}
       </CardContent>
