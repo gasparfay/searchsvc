@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useApp } from "@/context/AppContext";
 import { IconCopy, IconCheck, IconPlayground } from "@/components/icons";
+import PageHeader from "@/components/PageHeader";
 
 const PRESET_QUERIES = ["catalogo", "productos", "soporte", "hardware", "contacto", "garantia"];
 
@@ -188,23 +189,23 @@ db.documents.find(${JSON.stringify(filter, null, 2)});`;
   return (
     <div className="h-full overflow-y-auto bg-slate-100">
       <div className="px-10 py-8 max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="text-xs mb-1.5 text-slate-400 uppercase tracking-wider">
-            SEARCHSVC / API PLAYGROUND
-          </div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-slate-900">
-              Simulador del Endpoint de Búsqueda
-            </h1>
-            <span className="text-xs px-2.5 py-1 rounded-full font-mono bg-emerald-100 text-emerald-800 border border-emerald-200">
-              GET /search?q=...
-            </span>
-          </div>
-          <p className="text-xs text-slate-500 mt-1 max-w-2xl">
-            Comprobá cómo las aplicaciones externas consumen el servicio de indexación con tu API Key y cómo MongoDB resuelve las consultas mediante índices <code className="bg-slate-200 px-1 py-0.5 rounded font-mono">$text</code>.
-          </p>
-        </div>
+        {/* Page Header Component */}
+        <PageHeader
+          breadcrumb="SEARCHSVC / API PLAYGROUND"
+          title={
+            <div className="flex items-center gap-3 flex-wrap">
+              <span>Simulador del Endpoint de Búsqueda</span>
+              <span className="text-xs px-2.5 py-0.5 rounded-full font-mono bg-emerald-100 text-emerald-800 border border-emerald-200">
+                GET /search?q=...
+              </span>
+            </div>
+          }
+          subtitle={
+            <p className="text-xs text-slate-500 max-w-2xl">
+              Comprobá cómo las aplicaciones externas consumen el servicio de indexación con tu API Key y cómo MongoDB resuelve las consultas mediante índices <code className="bg-slate-200 px-1 py-0.5 rounded font-mono">$text</code>.
+            </p>
+          }
+        />
 
         {/* Panel 1: Barra de Petición HTTP */}
         <div className="rounded-xl overflow-hidden shadow-xs mb-6 bg-[#0e1525] border border-[#1e3a5f]">

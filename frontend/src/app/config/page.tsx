@@ -4,9 +4,11 @@ import { useState, useRef } from "react";
 import Link from "next/link";
 import { useApp } from "@/context/AppContext";
 import { IconCopy, IconCheck, IconRefresh } from "@/components/icons";
+import PageHeader from "@/components/PageHeader";
+import StatusBadge from "@/components/StatusBadge";
 
 export default function ConfigPage() {
-  const { account, regenerateApiKey, updateAccount } = useApp();
+  const { account } = useApp();
 
   const keyInputRef = useRef<HTMLInputElement>(null);
 
@@ -125,12 +127,10 @@ export default function ConfigPage() {
   return (
     <div className="h-full overflow-y-auto bg-slate-100">
       <div className="px-10 py-8 max-w-3xl">
-        <div className="text-xs mb-1.5 text-slate-400 uppercase tracking-wider">
-          CONFIGURACIÓN / CUENTA
-        </div>
-        <h1 className="text-2xl font-bold mb-8 text-slate-900">
-          Configuración de Cuenta
-        </h1>
+        <PageHeader
+          breadcrumb="CONFIGURACIÓN / CUENTA"
+          title="Configuración de Cuenta"
+        />
 
         {/* Panel 1: API Key Centralizada */}
         <div className="rounded-xl mb-6 shadow-xs overflow-hidden bg-[#0e1525] border border-[#1e3a5f]">
@@ -299,14 +299,9 @@ export default function ConfigPage() {
                 <div className="text-xs text-slate-500 font-mono">auth0Id: {account.auth0Id || "Sin vincular"}</div>
               </div>
             </div>
-            <span className={`text-xs px-2.5 py-1 rounded-full font-medium inline-flex items-center gap-1.5 ${
-              account.auth0Id
-                ? "text-emerald-800 bg-emerald-100 border border-emerald-200"
-                : "text-slate-600 bg-slate-100 border border-slate-200"
-            }`}>
-              <span className={`w-1.5 h-1.5 rounded-full ${account.auth0Id ? "bg-emerald-500" : "bg-slate-400"}`} />
+            <StatusBadge variant={account.auth0Id ? "success" : "neutral"}>
               {account.auth0Id ? "Vinculado con Google" : "Sin vincular a SSO"}
-            </span>
+            </StatusBadge>
 
           </div>
 

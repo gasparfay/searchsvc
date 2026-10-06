@@ -4,6 +4,7 @@ import { use } from "react";
 import Link from "next/link";
 import { useApp } from "@/context/AppContext";
 import { IconArrowLeft, IconExternalLink } from "@/components/icons";
+import StatusBadge from "@/components/StatusBadge";
 
 export default function DocumentDetailPage({
   params,
@@ -80,9 +81,9 @@ export default function DocumentDetailPage({
           {/* Header */}
           <div className="p-8 border-b border-slate-100">
             <div className="flex items-center gap-2.5 mb-2.5 flex-wrap">
-              <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+              <StatusBadge variant="success" className="text-[11px] font-bold">
                 HTTP {document.httpStatus || 200} OK
-              </span>
+              </StatusBadge>
               <span className="text-xs text-slate-400 font-mono">
                 Doc ID: {document.id}
               </span>

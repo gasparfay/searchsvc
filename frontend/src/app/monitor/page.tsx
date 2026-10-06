@@ -2,11 +2,15 @@
 
 import Link from "next/link";
 import { useApp } from "@/context/AppContext";
+import PageHeader from "@/components/PageHeader";
+import StatCard from "@/components/StatCard";
+import StatusBadge from "@/components/StatusBadge";
+import type { BadgeVariant } from "@/components/StatusBadge";
 
-const STATUS_MAP: Record<string, { label: string; dot: string; text: string; bg: string }> = {
-  completado: { label: "Completado", dot: "bg-emerald-500", text: "text-emerald-800", bg: "bg-emerald-50" },
-  corriendo:  { label: "En curso",   dot: "bg-amber-400",   text: "text-amber-800",   bg: "bg-amber-50" },
-  error:      { label: "Error",      dot: "bg-red-500",     text: "text-red-800",     bg: "bg-red-50" },
+const STATUS_VARIANT_MAP: Record<string, { label: string; variant: BadgeVariant }> = {
+  completado: { label: "Completado", variant: "success" },
+  corriendo:  { label: "En curso",   variant: "warning" },
+  error:      { label: "Error",      variant: "error" },
 };
 
 export default function MonitorPage() {
@@ -19,39 +23,42 @@ export default function MonitorPage() {
   return (
     <div className="h-full overflow-y-auto bg-slate-100">
       <div className="px-10 py-8">
-        <div className="text-xs mb-1.5 text-slate-400 uppercase tracking-wider">
-          MONITOREO / JOBS DEL CRAWLER
-        </div>
-        <h1 className="text-2xl font-bold mb-8 text-slate-900">
-          Historial de Tareas y Corridas
-        </h1>
+        {/* Page Header Component */}
+        <PageHeader
+          breadcrumb="MONITOREO / JOBS DEL CRAWLER"
+          title="Historial de Tareas y Corridas"
+        />
 
-        {/* Stats */}
+        {/* Stats Widgets */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="px-5 py-4 rounded-xl bg-blue-50 border border-blue-200">
-            <div className="text-xs mb-1.5 font-bold uppercase tracking-wider text-blue-900/70">
-              Corridas registradas
-            </div>
-            <div className="text-3xl font-bold text-blue-950">{jobs.length}</div>
-          </div>
-          <div className="px-5 py-4 rounded-xl bg-emerald-50 border border-emerald-200">
-            <div className="text-xs mb-1.5 font-bold uppercase tracking-wider text-emerald-900/70">
-              Completadas
-            </div>
-            <div className="text-3xl font-bold text-emerald-950">{completedCount}</div>
-          </div>
-          <div className="px-5 py-4 rounded-xl bg-amber-50 border border-amber-200">
-            <div className="text-xs mb-1.5 font-bold uppercase tracking-wider text-amber-900/70">
-              En curso
-            </div>
-            <div className="text-3xl font-bold text-amber-950">{runningCount}</div>
-          </div>
-          <div className="px-5 py-4 rounded-xl bg-red-50 border border-red-200">
-            <div className="text-xs mb-1.5 font-bold uppercase tracking-wider text-red-900/70">
-              Con fallos
-            </div>
-            <div className="text-3xl font-bold text-red-950">{errorCount}</div>
-          </div>
+          <StatCard
+            label="Corridas registradas"
+            value={jobs.length}
+            color="#1e3a6e"
+            bg="#dbeafe"
+            border="#bfdbfe"
+          />
+          <StatCard
+            label="Completadas"
+            value={completedCount}
+            color="#166534"
+            bg="#dcfce7"
+            border="#bbf7d0"
+          />
+          <StatCard
+            label="En curso"
+            value={runningCount}
+            color="#854d0e"
+            bg="#fef9c3"
+            border="#fef08a"
+          />
+          <StatCard
+            label="Con fallos"
+            value={errorCount}
+            color="#991b1b"
+            bg="#fee2e2"
+            border="#fecaca"
+          />
         </div>
 
         {/* Table Card */}
@@ -81,7 +88,7 @@ export default function MonitorPage() {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {jobs.map((job) => {
-                  const status = STATUS_MAP[job.estado] || STATUS_MAP.completado;
+                  const statusInfo = STATUS_VARIANT_MAP[job.estado] || STATUS_VARIANT_MAP.completado;
                   return (
                     <tr
                       key={job.id}
@@ -114,12 +121,9 @@ export default function MonitorPage() {
                         {job.errores}
                       </td>
                       <td className="px-6 py-4">
-                        <span
-                          className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${status.bg} ${status.text}`}
-                        >
-                          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${status.dot}`} />
-                          {status.label}
-                        </span>
+                        <StatusBadge variant={statusInfo.variant}>
+                          {statusInfo.label}
+                        </StatusBadge>
                       </td>
                       <td className="px-6 py-4 text-right">
                         <Link

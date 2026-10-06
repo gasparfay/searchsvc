@@ -2,20 +2,19 @@
 
 import { useState, useMemo, useEffect, use } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useApp } from "@/context/AppContext";
 import {
   IconArrowLeft,
   IconPlay,
   IconEdit,
   IconTrash,
-  IconSearch,
-  IconClose,
-  IconCheck,
 } from "@/components/icons";
 import SnapshotBar from "@/components/SnapshotBar";
 import DocumentCard from "@/components/DocumentCard";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
+import StatusBadge from "@/components/StatusBadge";
+import EmptyState from "@/components/EmptyState";
+import SearchInput from "@/components/SearchInput";
 
 export default function SiteDetailPage({
   params,
@@ -23,8 +22,7 @@ export default function SiteDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id: siteId } = use(params);
-  const router = useRouter();
-  const { sites, snapshots, documents, triggerCrawl, deleteSite } = useApp();
+  const { sites, snapshots, documents } = useApp();
 
   const site = sites.find((s) => s._id === siteId) || {
     _id: siteId || "65f1a2b3c4d5e6f7a8b9c011",
@@ -83,13 +81,12 @@ export default function SiteDetailPage({
     // Modo maquetado: el botón no realiza acción
   }
 
-
   return (
     <div className="h-full overflow-y-auto" style={{ background: "#f0f2f6" }}>
       <div className="px-10 py-8">
 
         {/* Header */}
-        <div className="flex items-start justify-between mb-6">
+        <div className="flex items-start justify-between mb-6 flex-wrap gap-4">
           <div>
             <Link
               href="/sites"
@@ -100,12 +97,11 @@ export default function SiteDetailPage({
             </Link>
             <div className="flex items-center gap-3">
               <h1 className="text-2xl font-bold text-slate-900">{site.name}</h1>
-              <span className="text-xs px-2.5 py-1 rounded-full font-medium bg-emerald-100 text-emerald-800 border border-emerald-200 inline-flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              <StatusBadge variant="success">
                 Programado: {site.frequency}
-              </span>
+              </StatusBadge>
             </div>
-            <div className="text-xs mt-1.5 font-mono text-slate-500 flex items-center gap-3">
+            <div className="text-xs mt-1.5 font-mono text-slate-500 flex items-center gap-3 flex-wrap">
               <span>URL: <strong className="text-slate-800">{site.url}</strong></span>
               <span>·</span>
               <span>Profundidad: <strong className="text-slate-800">{site.maxDepth} niveles</strong></span>
@@ -144,10 +140,9 @@ export default function SiteDetailPage({
           </div>
         </div>
 
-
         {/* Panel 1: Historical Snapshots */}
         <div className="rounded-xl mb-6 bg-white border border-slate-200 shadow-xs">
-          <div className="px-6 py-4 flex items-center justify-between border-b border-slate-100">
+          <div className="px-6 py-4 flex items-center justify-between border-b border-slate-100 flex-wrap gap-2">
             <div>
               <div className="text-xs font-bold text-slate-900 tracking-wider">
                 SNAPSHOTS HISTÓRICOS DEL SITIO ({siteSnapshots.length})
@@ -177,25 +172,21 @@ export default function SiteDetailPage({
 
         {/* Panel 2: Documents Grid or Zero-Snapshot Empty State */}
         {siteSnapshots.length === 0 ? (
-          <div className="rounded-xl p-10 text-center bg-white border border-slate-200 shadow-xs flex flex-col items-center justify-center">
-            <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3">
-              <IconPlay />
-            </div>
-            <h3 className="text-sm font-bold text-slate-900 mb-1">
-              Este sitio aún no tiene documentos indexados
-            </h3>
-            <p className="text-xs text-slate-500 max-w-md mx-auto mb-5 leading-relaxed">
-              Aún no se ha realizado ninguna corrida de crawler para {site.name}. Presioná el botón a continuación para iniciar la primera indexación.
-            </p>
-            <button
-              type="button"
-              onClick={handleTriggerCrawl}
-              className="px-5 py-2.5 text-xs font-bold rounded-lg bg-[#3ddc84] hover:bg-[#2bc971] active:scale-95 text-[#0a1f14] transition-all cursor-pointer shadow-xs inline-flex items-center gap-2"
-            >
-              <IconPlay />
-              Iniciar Primera Indexación
-            </button>
-          </div>
+          <EmptyState
+            icon={<IconPlay />}
+            title="Este sitio aún no tiene documentos indexados"
+            description={`Aún no se ha realizado ninguna corrida de crawler para ${site.name}. Presioná el botón a continuación para iniciar la primera indexación.`}
+            action={
+              <button
+                type="button"
+                onClick={handleTriggerCrawl}
+                className="px-5 py-2.5 text-xs font-bold rounded-lg bg-[#3ddc84] hover:bg-[#2bc971] active:scale-95 text-[#0a1f14] transition-all cursor-pointer shadow-xs inline-flex items-center gap-2"
+              >
+                <IconPlay />
+                Iniciar Primera Indexación
+              </button>
+            }
+          />
         ) : (
           <div className="rounded-xl bg-white border border-slate-200 shadow-xs">
             <div className="px-6 py-4 flex items-center justify-between gap-4 border-b border-slate-100 flex-wrap">
@@ -208,23 +199,13 @@ export default function SiteDetailPage({
                 </div>
               </div>
 
-              {/* Filter input */}
-              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-xs min-w-[280px]">
-                <span className="text-slate-400">
-                  <IconSearch />
-                </span>
-                <input
-                  value={querySearch}
-                  onChange={(e) => setQuerySearch(e.target.value)}
-                  placeholder="Filtrar por título, url o descripción..."
-                  className="flex-1 bg-transparent text-xs focus:outline-none text-slate-700"
-                />
-                {querySearch && (
-                  <button onClick={() => setQuerySearch("")} className="text-slate-400 hover:text-slate-600 cursor-pointer">
-                    <IconClose />
-                  </button>
-                )}
-              </div>
+              {/* Reusable SearchInput */}
+              <SearchInput
+                value={querySearch}
+                onChange={setQuerySearch}
+                placeholder="Filtrar por título, url o descripción..."
+                className="min-w-[280px]"
+              />
             </div>
 
             {/* Cards Grid */}
@@ -243,7 +224,6 @@ export default function SiteDetailPage({
             </div>
           </div>
         )}
-
 
       </div>
 

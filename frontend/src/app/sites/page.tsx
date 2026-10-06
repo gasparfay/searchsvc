@@ -3,12 +3,13 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { useApp } from "@/context/AppContext";
+import PageHeader from "@/components/PageHeader";
 import StatCard from "@/components/StatCard";
 import SiteTable from "@/components/SiteTable";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
 
 export default function SitesPage() {
-  const { sites, jobs, deleteSite } = useApp();
+  const { sites, jobs } = useApp();
   const [siteToDelete, setSiteToDelete] = useState<{ id: string; name: string } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"recent" | "name" | "docs">("recent");
@@ -40,26 +41,22 @@ export default function SitesPage() {
     <div className="h-full overflow-y-auto" style={{ background: "#f0f2f6" }}>
       <div className="px-10 py-8">
 
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <div className="text-xs mb-1.5 text-slate-400 tracking-wider">
-              MIS SITIOS / RESUMEN
-            </div>
-            <h1 className="text-2xl font-bold text-slate-900">
-              Sitios Registrados
-            </h1>
-          </div>
-          <Link
-            href="/sites/new"
-            className="flex items-center gap-2 px-5 py-3 text-sm font-bold rounded bg-[#3ddc84] hover:bg-[#2bc971] text-[#0a1f14] transition-all cursor-pointer shadow-xs"
-          >
-            + Registrar Nuevo Sitio
-          </Link>
-        </div>
+        {/* Page Header Component */}
+        <PageHeader
+          breadcrumb="MIS SITIOS / RESUMEN"
+          title="Sitios Registrados"
+          action={
+            <Link
+              href="/sites/new"
+              className="flex items-center gap-2 px-5 py-3 text-sm font-bold rounded bg-[#3ddc84] hover:bg-[#2bc971] text-[#0a1f14] transition-all cursor-pointer shadow-xs"
+            >
+              + Registrar Nuevo Sitio
+            </Link>
+          }
+        />
 
         {/* Stats Widgets */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           <StatCard
             label="Sitios registrados"
             value={totalSites}
