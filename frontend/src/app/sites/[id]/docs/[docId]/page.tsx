@@ -5,6 +5,9 @@ import Link from "next/link";
 import { useApp } from "@/context/AppContext";
 import { IconArrowLeft, IconExternalLink } from "@/components/icons";
 import StatusBadge from "@/components/StatusBadge";
+import { Card, CardHeader, CardBody, CardFooter } from "@/components/Card";
+import CodeBlock from "@/components/CodeBlock";
+import MetadataGrid from "@/components/MetadataGrid";
 
 export default function DocumentDetailPage({
   params,
@@ -76,10 +79,10 @@ export default function DocumentDetailPage({
           </div>
         </div>
 
-        {/* Main Card */}
-        <div className="rounded-xl overflow-hidden shadow-xs bg-white border border-slate-200">
+        {/* Main Document Card */}
+        <Card>
           {/* Header */}
-          <div className="p-8 border-b border-slate-100">
+          <CardHeader>
             <div className="flex items-center gap-2.5 mb-2.5 flex-wrap">
               <StatusBadge variant="success" className="text-[11px] font-bold">
                 HTTP {document.httpStatus || 200} OK
@@ -97,21 +100,19 @@ export default function DocumentDetailPage({
               {document.name}
             </h1>
 
-            <div className="flex items-center gap-3">
-              <a
-                href={document.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs font-mono text-emerald-600 hover:text-emerald-700 hover:underline inline-flex items-center gap-1.5 break-all"
-              >
-                {document.url}
-                <IconExternalLink />
-              </a>
-            </div>
-          </div>
+            <a
+              href={document.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-mono text-emerald-600 hover:text-emerald-700 hover:underline inline-flex items-center gap-1.5 break-all"
+            >
+              {document.url}
+              <IconExternalLink />
+            </a>
+          </CardHeader>
 
-          {/* Content Body */}
-          <div className="p-8 space-y-6">
+          {/* Body */}
+          <CardBody>
             {/* Description */}
             <div>
               <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
@@ -122,45 +123,31 @@ export default function DocumentDetailPage({
               </div>
             </div>
 
-            {/* Full text content */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                  Contenido de Texto Indexado
-                </h2>
-                <span className="text-[11px] text-slate-400 font-mono">
-                  {document.content?.length || 0} caracteres
-                </span>
-              </div>
-              <div className="text-xs text-slate-300 bg-[#0e1525] p-5 rounded-lg font-mono leading-relaxed whitespace-pre-wrap max-h-96 overflow-y-auto border border-slate-800">
-                {document.content || "Sin contenido de texto indexado."}
-              </div>
-            </div>
+            {/* Indexed Content */}
+            <CodeBlock
+              title="Contenido de Texto Indexado"
+              content={document.content}
+            />
 
-            {/* Metadata grid */}
-            <div className="pt-6 border-t border-slate-100">
-              <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">
-                Metadatos del Documento y Rastreo
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-                <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-100">
-                  <span className="text-slate-400 block mb-1">Sitio Asociado</span>
-                  <span className="font-semibold text-slate-800">{site?.name}</span>
-                </div>
-                <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-100">
-                  <span className="text-slate-400 block mb-1">Fecha de Captura</span>
-                  <span className="font-mono text-slate-800">{document.crawledAt}</span>
-                </div>
-                <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-100">
-                  <span className="text-slate-400 block mb-1">Snapshot</span>
-                  <span className="font-mono font-semibold text-emerald-700">{document.snapshotId}</span>
-                </div>
-              </div>
-            </div>
-          </div>
+            {/* Metadata Grid */}
+            <MetadataGrid
+              title="Metadatos del Documento y Rastreo"
+              items={[
+                { label: "Sitio Asociado", value: site?.name },
+                {
+                  label: "Fecha de Captura",
+                  value: <span className="font-mono">{document.crawledAt}</span>,
+                },
+                {
+                  label: "Snapshot",
+                  value: <span className="font-mono text-emerald-700">{document.snapshotId}</span>,
+                },
+              ]}
+            />
+          </CardBody>
 
           {/* Footer */}
-          <div className="px-8 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+          <CardFooter>
             <Link
               href={`/sites/${siteId}`}
               className="text-xs font-semibold text-slate-600 hover:text-slate-900"
@@ -170,8 +157,8 @@ export default function DocumentDetailPage({
             <span className="text-xs text-slate-400 font-mono">
               Documento {currentIndex + 1} de {snapshotDocs.length} en este snapshot
             </span>
-          </div>
-        </div>
+          </CardFooter>
+        </Card>
       </div>
     </div>
   );
