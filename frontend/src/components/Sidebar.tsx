@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MOCK_ACCOUNT } from "@/data/mock-data";
+import { useApp } from "@/context/AppContext";
 
 const IconSites = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -30,13 +30,18 @@ const IconConfig = () => (
 );
 
 const NAV = [
-  { href: "/sites", label: "Mis Sitios",    Icon: IconSites   },
-  { href: "/monitor", label: "Monitoreo",   Icon: IconMonitor },
+  { href: "/sites",   label: "Mis Sitios",    Icon: IconSites   },
+  { href: "/monitor", label: "Monitoreo",     Icon: IconMonitor },
   { href: "/config",  label: "Configuración", Icon: IconConfig  },
 ] as const;
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { account } = useApp();
+
+  const initials = account.name
+    ? account.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()
+    : "JS";
 
   return (
     <aside className="flex flex-col h-full shrink-0" style={{
@@ -100,11 +105,11 @@ export default function Sidebar() {
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded flex items-center justify-center text-xs font-bold shrink-0"
             style={{ background: "rgba(61,220,132,0.15)", color: "#3ddc84", border: "1px solid rgba(61,220,132,0.25)" }}>
-            {MOCK_ACCOUNT.name.split(" ").map(n => n[0]).join("")}
+            {initials}
           </div>
           <div className="min-w-0">
-            <div className="text-sm font-medium truncate" style={{ color: "#c8d8ec" }}>{MOCK_ACCOUNT.name}</div>
-            <div className="text-xs truncate" style={{ color: "#3a5570" }}>{MOCK_ACCOUNT.email}</div>
+            <div className="text-sm font-medium truncate" style={{ color: "#c8d8ec" }}>{account.name}</div>
+            <div className="text-xs truncate" style={{ color: "#3a5570" }}>{account.email}</div>
           </div>
         </div>
       </div>

@@ -7,26 +7,33 @@ export interface Site {
   frequency: string;
   extractorSnippet: string;
   pageResolverSnippet?: string;
-  status: "activo" | "pausado" | "error";
   docsCount: number;
-  lastRun: string;
+  lastRunDate?: string;
+  lastRunStatus?: "ok" | "error";
   createdAt?: string;
   updatedAt?: string;
 }
 
 export interface CrawlSnapshot {
   id: string;
+  siteId: string;
   fecha: string;
   docs: number;
   estado: "ok" | "parcial" | "error";
   duracion: string;
+  pagesVisited: number;
 }
 
 export interface ExtractedDocument {
   id: string;
-  titulo: string;
+  siteId: string;
+  snapshotId: string;
+  name: string;
   url: string;
-  desc: string;
+  description: string;
+  content: string;
+  crawledAt: string;
+  httpStatus?: number;
 }
 
 export interface Account {
@@ -39,6 +46,7 @@ export interface Account {
 
 export interface CrawlJob {
   id: string;
+  siteId: string;
   sitio: string;
   inicio: string;
   duracion: string;

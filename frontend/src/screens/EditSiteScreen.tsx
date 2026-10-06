@@ -1,40 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useApp } from "@/context/AppContext";
 
-const DEFAULT_EXTRACTOR = `function extract(request, response) {
-  const $ = response.body;
-
-  return [{
-    name: $('title').text(),
-    url: request.url,
-    description:
-      $('meta[property="og:description"]').attr('content') ||
-      $('meta[name="description"]').attr('content') ||
-      $('p').first().text().slice(0, 200)
-  }];
-}`;
-
-const DEFAULT_RESOLVER = `function pageResolver(request, response) {
-  const $ = response.body;
-  const links = [];
-
-  $('a[href]').each(function () {
-    const href = $(this).attr('href');
-    if (href && href.startsWith('/')) {
-      links.push(request.baseUrl + href);
-    }
-  });
-
-  return links;
-}`;
-
-export default function NewSiteScreen() {
+export default function EditSiteScreen({ siteId }: { siteId: string }) {
   const router = useRouter();
-  const { addSite } = useApp();
+  const { sites, updateSite } = useApp();
+
+  const site = sites.find((s) => s._id === siteId);
 
   const [form, setForm] = useState({
     name: "",
@@ -42,12 +17,37 @@ export default function NewSiteScreen() {
     maxDepth: 2,
     frequency: "Cada 24 horas",
   });
-  const [extractorSnippet, setExtractorSnippet] = useState(DEFAULT_EXTRACTOR);
-  const [pageResolverSnippet, setPageResolverSnippet] = useState(DEFAULT_RESOLVER);
+  const [extractorSnippet, setExtractorSnippet] = useState("");
+  const [pageResolverSnippet, setPageResolverSnippet] = useState("");
+
+  useEffect(() => {
+    if (site) {
+      setForm({
+        name: site.name,
+        url: site.url,
+        maxDepth: site.maxDepth,
+        frequency: site.frequency,
+      });
+      setExtractorSnippet(site.extractorSnippet || "");
+      setPageResolverSnippet(site.pageResolverSnippet || "");
+    }
+  }, [site]);
+
+  if (!site) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center p-8 text-center" style={{ background: "#f0f2f6" }}>
+        <h2 className="text-lg font-bold text-slate-800 mb-2">Sitio no encontrado</h2>
+        <p className="text-xs text-slate-500 mb-4">No se encontró ningún sitio con el identificador {siteId}.</p>
+        <Link href="/sites" className="text-xs text-emerald-600 font-bold hover:underline">
+          ← Volver a Mis Sitios
+        </Link>
+      </div>
+    );
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const newSite = addSite({
+    updateSite(siteId, {
       name: form.name.trim(),
       url: form.url.trim(),
       maxDepth: form.maxDepth,
@@ -55,7 +55,7 @@ export default function NewSiteScreen() {
       extractorSnippet,
       pageResolverSnippet: pageResolverSnippet.trim() ? pageResolverSnippet : undefined,
     });
-    router.push(`/sites/${newSite._id}`);
+    router.push(`/sites/${siteId}`);
   }
 
   return (
@@ -66,14 +66,15 @@ export default function NewSiteScreen() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <div className="text-xs mb-1.5" style={{ color: "#94a3b8", letterSpacing: "0.08em" }}>
-              MIS SITIOS / REGISTRAR NUEVO
+              MIS SITIOS / EDITAR CONFIGURACIÓN
             </div>
             <h1 className="text-2xl font-bold" style={{ color: "#0f172a" }}>
-              Registrar Nuevo Sitio
+              Editar {site.name}
             </h1>
+            <div className="text-xs text-slate-400 font-mono mt-0.5">ID: {site._id}</div>
           </div>
           <Link
-            href="/sites"
+            href={`/sites/${siteId}`}
             className="text-xs transition-colors"
             style={{ color: "#94a3b8" }}
             onMouseEnter={(e) => (e.currentTarget.style.color = "#475569")}
@@ -83,7 +84,7 @@ export default function NewSiteScreen() {
           </Link>
         </div>
 
-        {/* Card formulario */}
+        {/* Formulario */}
         <form onSubmit={handleSubmit} className="rounded-xl" style={{ background: "#ffffff", border: "1px solid #e2e8f0", boxShadow: "0 4px 16px rgba(0,0,0,0.06)" }}>
 
           {/* Sección 1: Parámetros del sitio */}
@@ -92,7 +93,7 @@ export default function NewSiteScreen() {
               PARÁMETROS DEL SITIO
             </div>
             <div className="text-xs mb-6" style={{ color: "#94a3b8" }}>
-              Definí el sitio a inspeccionar y los límites de profundidad para el crawler.
+              Modificá la URL base y las directivas de exploración del crawler.
             </div>
 
             <div className="grid grid-cols-2 gap-6">
@@ -105,7 +106,6 @@ export default function NewSiteScreen() {
                   required
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="Ej: Tienda Ejemplo"
                   className="w-full px-4 py-3 text-sm rounded-lg focus:outline-none transition-colors"
                   style={{ background: "#f8fafc", border: "1px solid #e2e8f0", color: "#0f172a" }}
                   onFocus={(e) => (e.target.style.borderColor = "#3ddc84")}
@@ -122,7 +122,6 @@ export default function NewSiteScreen() {
                   required
                   value={form.url}
                   onChange={(e) => setForm({ ...form, url: e.target.value })}
-                  placeholder="https://example.com"
                   className="w-full px-4 py-3 text-sm rounded-lg focus:outline-none transition-colors font-mono"
                   style={{ background: "#f8fafc", border: "1px solid #e2e8f0", color: "#0f172a" }}
                   onFocus={(e) => (e.target.style.borderColor = "#3ddc84")}
@@ -141,7 +140,7 @@ export default function NewSiteScreen() {
                   style={{ background: "#f8fafc", border: "1px solid #e2e8f0", color: "#0f172a" }}
                 >
                   <option value={1}>1 nivel — Solo Home</option>
-                  <option value={2}>2 niveles — Home + enlaces directos (por defecto)</option>
+                  <option value={2}>2 niveles — Home + enlaces directos</option>
                   <option value={3}>3 niveles — Home + enlaces + subpáginas</option>
                   <option value={4}>4 niveles — Exploración profunda</option>
                 </select>
@@ -180,7 +179,7 @@ export default function NewSiteScreen() {
               SNIPPETS JAVASCRIPT (CHEERIO)
             </div>
             <div className="text-xs mb-6" style={{ color: "#94a3b8" }}>
-              Código JavaScript ejecutado en el backend para parsear el contenido HTML de cada página.
+              Modificá los scripts ejecutados en el sandbox para parsear y resolver enlaces.
             </div>
 
             <div className="grid grid-cols-2 gap-6">
@@ -190,7 +189,7 @@ export default function NewSiteScreen() {
                   <label className="text-xs font-medium" style={{ color: "#475569" }}>
                     DOCUMENT EXTRACTOR *
                   </label>
-                  <span className="text-xs font-medium" style={{ color: "#3ddc84" }}>Requerido</span>
+                  <span className="text-xs font-medium text-emerald-500">Requerido</span>
                 </div>
                 <div className="rounded-lg overflow-hidden" style={{ border: "1px solid #1e2d42" }}>
                   <div className="flex items-center gap-2 px-4 py-2" style={{ background: "#162032" }}>
@@ -216,7 +215,7 @@ export default function NewSiteScreen() {
                   <label className="text-xs font-medium" style={{ color: "#475569" }}>
                     PAGE RESOLVER
                   </label>
-                  <span className="text-xs" style={{ color: "#94a3b8" }}>Opcional</span>
+                  <span className="text-xs text-slate-400">Opcional</span>
                 </div>
                 <div className="rounded-lg overflow-hidden" style={{ border: "1px solid #1e2d42" }}>
                   <div className="flex items-center gap-2 px-4 py-2" style={{ background: "#162032" }}>
@@ -241,7 +240,7 @@ export default function NewSiteScreen() {
           {/* Acciones */}
           <div className="flex items-center justify-between px-8 py-5 bg-slate-50 rounded-b-xl">
             <Link
-              href="/sites"
+              href={`/sites/${siteId}`}
               className="text-sm transition-colors text-slate-500 hover:text-slate-800"
             >
               Cancelar
@@ -253,7 +252,7 @@ export default function NewSiteScreen() {
               onMouseEnter={(e) => (e.currentTarget.style.background = "#2bc971")}
               onMouseLeave={(e) => (e.currentTarget.style.background = "#3ddc84")}
             >
-              Guardar y Registrar Sitio →
+              Guardar Cambios →
             </button>
           </div>
         </form>

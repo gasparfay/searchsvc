@@ -1,6 +1,6 @@
 import type { Site, CrawlSnapshot, ExtractedDocument, CrawlJob, Account } from "@/types";
 
-export const MOCK_ACCOUNT: Account = {
+export const INITIAL_ACCOUNT: Account = {
   _id: "65f1a2b3c4d5e6f7a8b9c001",
   name: "Jason Sweet",
   email: "jason.sweet@acme.corp",
@@ -8,7 +8,7 @@ export const MOCK_ACCOUNT: Account = {
   auth0Id: "google-oauth2|10928374651928374",
 };
 
-export const MOCK_SITES: Site[] = [
+export const INITIAL_SITES: Site[] = [
   {
     _id: "65f1a2b3c4d5e6f7a8b9c011",
     accountId: "65f1a2b3c4d5e6f7a8b9c001",
@@ -16,10 +16,10 @@ export const MOCK_SITES: Site[] = [
     url: "https://example.com",
     maxDepth: 2,
     frequency: "Cada 6 horas",
-    status: "activo",
     docsCount: 1842,
-    lastRun: "Hace 2 horas",
-    extractorSnippet: `function extract(request, response) {\n  const $ = response.body;\n  return [{\n    name: $('title').text(),\n    url: request.url,\n    description: $('meta[name="description"]').attr('content') || $('p').first().text()\n  }];\n}`,
+    lastRunDate: "Hoy, 09:12",
+    lastRunStatus: "ok",
+    extractorSnippet: `function extract(request, response) {\n  const $ = response.body;\n  return [{\n    name: $('title').text(),\n    url: request.url,\n    description: $('meta[name=\"description\"]').attr('content') || $('p').first().text().slice(0, 200)\n  }];\n}`,
     pageResolverSnippet: `function pageResolver(request, response) {\n  const $ = response.body;\n  const links = [];\n  $('a[href]').each(function() {\n    const href = $(this).attr('href');\n    if (href && href.startsWith('/')) links.push(request.baseUrl + href);\n  });\n  return links;\n}`,
   },
   {
@@ -29,9 +29,9 @@ export const MOCK_SITES: Site[] = [
     url: "https://techblog.acme.io",
     maxDepth: 3,
     frequency: "Cada 12 horas",
-    status: "activo",
     docsCount: 4391,
-    lastRun: "Hace 3 horas",
+    lastRunDate: "Hoy, 06:00",
+    lastRunStatus: "ok",
     extractorSnippet: `function extract(request, response) {\n  const $ = response.body;\n  return [{\n    name: $('h1').first().text(),\n    url: request.url,\n    description: $('article p').first().text()\n  }];\n}`,
   },
   {
@@ -41,9 +41,9 @@ export const MOCK_SITES: Site[] = [
     url: "https://wiki.internal.acme.corp",
     maxDepth: 2,
     frequency: "Cada 12 horas",
-    status: "activo",
     docsCount: 3104,
-    lastRun: "Hace 1 hora",
+    lastRunDate: "Hoy, 08:50",
+    lastRunStatus: "ok",
     extractorSnippet: `function extract(request, response) {\n  const $ = response.body;\n  return [{\n    name: $('title').text(),\n    url: request.url,\n    description: $('.wiki-content p').first().text()\n  }];\n}`,
   },
   {
@@ -53,9 +53,9 @@ export const MOCK_SITES: Site[] = [
     url: "https://docs.product.dev",
     maxDepth: 3,
     frequency: "Cada 24 horas",
-    status: "pausado",
     docsCount: 782,
-    lastRun: "Hace 1 día",
+    lastRunDate: "Ayer, 14:30",
+    lastRunStatus: "ok",
     extractorSnippet: `function extract(request, response) {\n  const $ = response.body;\n  return [{\n    name: $('title').text(),\n    url: request.url,\n    description: $('main p').first().text()\n  }];\n}`,
   },
   {
@@ -65,9 +65,9 @@ export const MOCK_SITES: Site[] = [
     url: "https://legal.acme.corp",
     maxDepth: 2,
     frequency: "Cada 48 horas",
-    status: "error",
     docsCount: 229,
-    lastRun: "Hace 2 días",
+    lastRunDate: "Hace 2 días",
+    lastRunStatus: "error",
     extractorSnippet: `function extract(request, response) {\n  const $ = response.body;\n  return [{\n    name: $('title').text(),\n    url: request.url,\n    description: $('p').first().text()\n  }];\n}`,
   },
   {
@@ -77,35 +77,95 @@ export const MOCK_SITES: Site[] = [
     url: "https://support.acme.corp",
     maxDepth: 2,
     frequency: "Cada 6 horas",
-    status: "activo",
     docsCount: 956,
-    lastRun: "Hace 30 min",
+    lastRunDate: "Hoy, 07:45",
+    lastRunStatus: "ok",
     extractorSnippet: `function extract(request, response) {\n  const $ = response.body;\n  return [{\n    name: $('title').text(),\n    url: request.url,\n    description: $('.faq-summary').text()\n  }];\n}`,
   },
 ];
 
-export const MOCK_SNAPSHOTS: CrawlSnapshot[] = [
-  { id: "snap-019", fecha: "04 sep · 09:12", docs: 1842, estado: "ok", duracion: "21m 08s" },
-  { id: "snap-018", fecha: "04 sep · 03:12", docs: 1839, estado: "ok", duracion: "20m 44s" },
-  { id: "snap-017", fecha: "03 sep · 21:12", docs: 1835, estado: "ok", duracion: "22m 01s" },
-  { id: "snap-016", fecha: "03 sep · 15:12", docs: 1301, estado: "parcial", duracion: "14m 32s" },
-  { id: "snap-015", fecha: "03 sep · 09:12", docs: 1828, estado: "ok", duracion: "19m 55s" },
+export const INITIAL_SNAPSHOTS: CrawlSnapshot[] = [
+  { id: "snap-019", siteId: "65f1a2b3c4d5e6f7a8b9c011", fecha: "04 sep 2026 · 09:12", docs: 1842, estado: "ok", duracion: "21m 08s", pagesVisited: 1842 },
+  { id: "snap-018", siteId: "65f1a2b3c4d5e6f7a8b9c011", fecha: "04 sep 2026 · 03:12", docs: 1839, estado: "ok", duracion: "20m 44s", pagesVisited: 1839 },
+  { id: "snap-017", siteId: "65f1a2b3c4d5e6f7a8b9c011", fecha: "03 sep 2026 · 21:12", docs: 1835, estado: "ok", duracion: "22m 01s", pagesVisited: 1835 },
+  { id: "snap-016", siteId: "65f1a2b3c4d5e6f7a8b9c011", fecha: "03 sep 2026 · 15:12", docs: 1301, estado: "parcial", duracion: "14m 32s", pagesVisited: 1500 },
+  { id: "snap-015", siteId: "65f1a2b3c4d5e6f7a8b9c011", fecha: "03 sep 2026 · 09:12", docs: 1828, estado: "ok", duracion: "19m 55s", pagesVisited: 1828 },
 ];
 
-export const MOCK_DOCUMENTS: ExtractedDocument[] = [
-  { id: "doc-001", titulo: "Página de Contacto", url: "https://example.com/contacto", desc: "Información de contacto, formularios de soporte y canales de atención al cliente disponibles." },
-  { id: "doc-002", titulo: "Catálogo de Productos", url: "https://example.com/productos", desc: "Listado completo de productos disponibles con precios, descripciones y disponibilidad de stock." },
-  { id: "doc-003", titulo: "Quiénes Somos", url: "https://example.com/nosotros", desc: "Historia de la empresa, misión, visión y el equipo detrás de la tienda. Fundada en 2014." },
-  { id: "doc-004", titulo: "Preguntas Frecuentes", url: "https://example.com/faq", desc: "Respuestas a las consultas más comunes sobre envíos, devoluciones, garantías y métodos de pago." },
-  { id: "doc-005", titulo: "Política de Devoluciones", url: "https://example.com/devoluciones", desc: "Procedimiento detallado para solicitar devoluciones y reembolsos. Plazo máximo de 30 días." },
-  { id: "doc-006", titulo: "Blog: Novedades", url: "https://example.com/blog", desc: "Últimas noticias, lanzamientos de productos y artículos de interés para nuestros clientes." },
+export const INITIAL_DOCUMENTS: ExtractedDocument[] = [
+  {
+    id: "doc-001",
+    siteId: "65f1a2b3c4d5e6f7a8b9c011",
+    snapshotId: "snap-019",
+    name: "Página de Contacto y Canales de Atención",
+    url: "https://example.com/contacto",
+    description: "Información de contacto, formularios de soporte directo y canales de atención al cliente corporativo disponibles 24/7.",
+    content: "Horarios de atención: Lunes a Viernes de 9:00 a 18:00. Teléfono: +54 11 4321-0000. Email de soporte: soporte@example.com. Oficinas centrales en Ciudad Autónoma de Buenos Aires.",
+    crawledAt: "2026-09-04 09:15:22",
+    httpStatus: 200,
+  },
+  {
+    id: "doc-002",
+    siteId: "65f1a2b3c4d5e6f7a8b9c011",
+    snapshotId: "snap-019",
+    name: "Catálogo Completo de Productos y Precios",
+    url: "https://example.com/productos",
+    description: "Listado completo de productos disponibles con especificaciones técnicas, precios en USD y disponibilidad de stock en tiempo real.",
+    content: "Explora nuestros artículos destacados en hardware, software e infraestructura de servidores. Todos los precios incluyen impuestos locales y garantía oficial de fábrica por 12 meses.",
+    crawledAt: "2026-09-04 09:17:40",
+    httpStatus: 200,
+  },
+  {
+    id: "doc-003",
+    siteId: "65f1a2b3c4d5e6f7a8b9c011",
+    snapshotId: "snap-019",
+    name: "Quiénes Somos — Nuestra Misión y Equipo",
+    url: "https://example.com/nosotros",
+    description: "Historia de la empresa, misión, visión y el equipo detrás de la plataforma. Fundada en 2014 con foco en innovación tecnológica.",
+    content: "Somos una compañía tecnológica comprometida con simplificar la gestión y búsqueda de información web. Nuestro equipo de ingenieros distribuidos trabaja para brindar herramientas de vanguardia.",
+    crawledAt: "2026-09-04 09:19:01",
+    httpStatus: 200,
+  },
+  {
+    id: "doc-004",
+    siteId: "65f1a2b3c4d5e6f7a8b9c011",
+    snapshotId: "snap-019",
+    name: "Preguntas Frecuentes (FAQ)",
+    url: "https://example.com/faq",
+    description: "Respuestas a las consultas más comunes sobre compras, envíos, garantías, facturación y métodos de pago aceptados.",
+    content: "¿Cómo rastreo mi pedido? Recibirás un enlace por correo con tu código de seguimiento. ¿Qué métodos de pago aceptan? Transferencias bancarias, tarjetas de crédito y billeteras virtuales.",
+    crawledAt: "2026-09-04 09:21:15",
+    httpStatus: 200,
+  },
+  {
+    id: "doc-005",
+    siteId: "65f1a2b3c4d5e6f7a8b9c011",
+    snapshotId: "snap-019",
+    name: "Política de Devoluciones y Reembolsos",
+    url: "https://example.com/devoluciones",
+    description: "Procedimiento detallado para solicitar devoluciones, cambios y reembolsos. Plazo máximo de 30 días posteriores a la recepción.",
+    content: "Condiciones de devolución: El producto debe encontrarse en su empaque original sin alteraciones. Para iniciar el trámite, comunícate con soporte adjuntando el comprobante de compra.",
+    crawledAt: "2026-09-04 09:23:50",
+    httpStatus: 200,
+  },
+  {
+    id: "doc-006",
+    siteId: "65f1a2b3c4d5e6f7a8b9c011",
+    snapshotId: "snap-019",
+    name: "Blog: Nuevas Actualizaciones de la Plataforma",
+    url: "https://example.com/blog",
+    description: "Últimas noticias, anuncios de lanzamientos, guías técnicas y artículos de interés para nuestra comunidad de usuarios.",
+    content: "Presentamos nuestro nuevo motor de indexación de texto completo con soporte para consultas semánticas y crawling asíncrono con Cheerio. Descubre todas las novedades en este artículo.",
+    crawledAt: "2026-09-04 09:25:10",
+    httpStatus: 200,
+  },
 ];
 
-export const MOCK_JOBS: CrawlJob[] = [
-  { id: "job-041", sitio: "Tienda Ejemplo", inicio: "04 sep · 09:12", duracion: "21m 08s", paginas: 1842, docs: 1842, errores: 2, estado: "completado" },
-  { id: "job-040", sitio: "Wiki Interna", inicio: "04 sep · 08:50", duracion: "18m 44s", paginas: 3104, docs: 3098, errores: 0, estado: "completado" },
-  { id: "job-039", sitio: "Blog Corporativo", inicio: "04 sep · 08:30", duracion: "en curso", paginas: 2103, docs: 2091, errores: 5, estado: "corriendo" },
-  { id: "job-038", sitio: "Portal de Soporte", inicio: "04 sep · 07:45", duracion: "9m 22s", paginas: 956, docs: 956, errores: 0, estado: "completado" },
-  { id: "job-037", sitio: "Repositorio Legal", inicio: "04 sep · 07:00", duracion: "2m 03s", paginas: 32, docs: 28, errores: 47, estado: "error" },
-  { id: "job-036", sitio: "Documentación Dev", inicio: "03 sep · 14:30", duracion: "9m 57s", paginas: 782, docs: 780, errores: 1, estado: "completado" },
+export const INITIAL_JOBS: CrawlJob[] = [
+  { id: "job-041", siteId: "65f1a2b3c4d5e6f7a8b9c011", sitio: "Tienda Ejemplo", inicio: "Hoy · 09:12", duracion: "21m 08s", paginas: 1842, docs: 1842, errores: 0, estado: "completado" },
+  { id: "job-040", siteId: "65f1a2b3c4d5e6f7a8b9c013", sitio: "Wiki Interna", inicio: "Hoy · 08:50", duracion: "18m 44s", paginas: 3104, docs: 3098, errores: 0, estado: "completado" },
+  { id: "job-039", siteId: "65f1a2b3c4d5e6f7a8b9c012", sitio: "Blog Corporativo", inicio: "Hoy · 06:00", duracion: "42m 11s", paginas: 4391, docs: 4391, errores: 0, estado: "completado" },
+  { id: "job-038", siteId: "65f1a2b3c4d5e6f7a8b9c016", sitio: "Portal de Soporte", inicio: "Hoy · 07:45", duracion: "9m 22s", paginas: 956, docs: 956, errores: 0, estado: "completado" },
+  { id: "job-037", siteId: "65f1a2b3c4d5e6f7a8b9c015", sitio: "Repositorio Legal", inicio: "Hace 2 días", duracion: "2m 03s", paginas: 32, docs: 28, errores: 4, estado: "error" },
+  { id: "job-036", siteId: "65f1a2b3c4d5e6f7a8b9c014", sitio: "Documentación Dev", inicio: "Ayer · 14:30", duracion: "9m 57s", paginas: 782, docs: 780, errores: 1, estado: "completado" },
 ];
