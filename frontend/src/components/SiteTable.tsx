@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import type { Site } from "@/types";
-import { IconEye, IconEdit, IconTrash, IconSearch, IconClose } from "@/components/icons";
+import { IconSites, IconEye, IconEdit, IconTrash, IconSearch, IconClose } from "@/components/icons";
 
 interface SiteTableProps {
   sites: Site[];
@@ -23,10 +23,33 @@ export default function SiteTable({
   onSortChange,
   onRequestDelete,
 }: SiteTableProps) {
+  if (sites.length === 0) {
+    return (
+      <div className="rounded-xl p-12 text-center bg-white border border-slate-200 shadow-xs flex flex-col items-center justify-center">
+        <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
+          <IconSites width={28} height={28} />
+        </div>
+        <h3 className="text-base font-bold text-slate-900 mb-1">
+          Aún no tienes sitios registrados
+        </h3>
+        <p className="text-xs text-slate-500 max-w-md mb-6 leading-relaxed">
+          Configurá la URL base del sitio web que deseás que el crawler explore, junto a los selectores de contenido y frecuencia de rastreo.
+        </p>
+        <Link
+          href="/sites/new"
+          className="px-5 py-2.5 text-xs font-bold rounded-lg bg-[#3ddc84] hover:bg-[#2bc971] text-[#0a1f14] transition-all shadow-xs inline-flex items-center gap-1.5 cursor-pointer active:scale-95"
+        >
+          + Registrar mi primer sitio
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-lg overflow-hidden bg-white border border-slate-200 shadow-xs">
       {/* Header bar with Search and Sort */}
       <div className="px-6 py-4 flex items-center justify-between gap-4 flex-wrap border-b border-slate-100">
+
         <div className="flex items-center gap-3">
           <div className="text-xs font-bold text-slate-900 tracking-wider">
             LISTADO DE SITIOS ({filteredSites.length}

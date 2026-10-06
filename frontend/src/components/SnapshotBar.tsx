@@ -13,11 +13,12 @@ export default function SnapshotBar({
 }: SnapshotBarProps) {
   if (snapshots.length === 0) {
     return (
-      <div className="py-6 px-4 text-xs text-slate-400">
-        No hay fotos registradas para este sitio aún. Haz clic en &quot;Ejecutar Crawl Ahora&quot; para generar la primera foto.
+      <div className="py-6 px-4 text-center rounded-lg bg-slate-50 border border-slate-100 text-xs text-slate-500">
+        No hay fotos históricas registradas para este sitio aún. Haz clic en <strong className="text-slate-700">&quot;Ejecutar Crawl Ahora&quot;</strong> para generar la primera foto.
       </div>
     );
   }
+
 
   return (
     <div className="flex items-center gap-3 overflow-x-auto pb-1">

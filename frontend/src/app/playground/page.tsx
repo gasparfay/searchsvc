@@ -364,10 +364,21 @@ export default function PlaygroundPage() {
                   </div>
                 ) : searchResults.length === 0 ? (
                   <div className="py-12 text-center text-slate-400 text-xs">
-                    No se encontraron documentos indexados que contengan &quot;<span className="text-slate-700 font-medium">{query}</span>&quot;.
-                    <div className="mt-2 text-slate-500">
-                      Probá buscando términos como <code className="bg-slate-100 px-1 py-0.5 rounded font-mono">catalogo</code>, <code className="bg-slate-100 px-1 py-0.5 rounded font-mono">productos</code> o <code className="bg-slate-100 px-1 py-0.5 rounded font-mono">soporte</code>.
-                    </div>
+                    {documents.length === 0 ? (
+                      <div>
+                        <p className="text-slate-600 font-medium mb-1">Aún no hay documentos indexados en el sistema.</p>
+                        <p className="text-slate-400">
+                          Registrá un sitio en <Link href="/sites" className="text-emerald-600 underline">Mis Sitios</Link> y ejecutá un crawl para generar las primeras páginas indexadas.
+                        </p>
+                      </div>
+                    ) : (
+                      <>
+                        No se encontraron documentos indexados que contengan &quot;<span className="text-slate-700 font-medium">{query}</span>&quot;.
+                        <div className="mt-2 text-slate-500">
+                          Probá buscando términos como <code className="bg-slate-100 px-1 py-0.5 rounded font-mono">catalogo</code>, <code className="bg-slate-100 px-1 py-0.5 rounded font-mono">productos</code> o <code className="bg-slate-100 px-1 py-0.5 rounded font-mono">soporte</code>.
+                        </div>
+                      </>
+                    )}
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

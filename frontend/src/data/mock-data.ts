@@ -244,3 +244,11 @@ export const INITIAL_JOBS: CrawlJob[] = [
   { id: "job-037", siteId: "65f1a2b3c4d5e6f7a8b9c015", sitio: "Repositorio Legal", inicio: "Hace 2 días", duracion: "2m 03s", paginas: 32, docs: 28, errores: 4, estado: "error" },
   { id: "job-036", siteId: "65f1a2b3c4d5e6f7a8b9c014", sitio: "Documentación Dev", inicio: "Ayer · 14:30", duracion: "9m 57s", paginas: 782, docs: 780, errores: 1, estado: "completado" },
 ];
+
+// Aliases for clean data layer separation
+export const MOCK_ACCOUNT = INITIAL_ACCOUNT;
+export const MOCK_SITES = INITIAL_SITES;
+export const MOCK_SNAPSHOTS = INITIAL_SNAPSHOTS;
+export const MOCK_DOCUMENTS = INITIAL_DOCUMENTS;
+export const MOCK_JOBS = INITIAL_JOBS;
+

@@ -216,52 +216,76 @@ export default function SiteDetailPage({
           </div>
         </div>
 
-        {/* Panel 2: Documents Grid */}
-        <div className="rounded-xl bg-white border border-slate-200 shadow-xs">
-          <div className="px-6 py-4 flex items-center justify-between gap-4 border-b border-slate-100 flex-wrap">
-            <div>
-              <div className="text-xs font-bold text-slate-900 tracking-wider">
-                DOCUMENTOS EXTRAÍDOS DE LA FOTO ({activeSnapshot ? activeSnapshot.id : "—"})
+        {/* Panel 2: Documents Grid or Zero-Snapshot Empty State */}
+        {siteSnapshots.length === 0 ? (
+          <div className="rounded-xl p-10 text-center bg-white border border-slate-200 shadow-xs flex flex-col items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3">
+              <IconPlay />
+            </div>
+            <h3 className="text-sm font-bold text-slate-900 mb-1">
+              Este sitio aún no tiene documentos indexados
+            </h3>
+            <p className="text-xs text-slate-500 max-w-md mx-auto mb-5 leading-relaxed">
+              Aún no se ha realizado ninguna corrida de crawler para {site.name}. Presioná el botón a continuación para iniciar la primera indexación y capturar la foto inicial.
+            </p>
+            <button
+              type="button"
+              onClick={handleTriggerCrawl}
+              disabled={isCrawling}
+              className="px-5 py-2.5 text-xs font-bold rounded-lg bg-[#3ddc84] hover:bg-[#2bc971] active:scale-95 text-[#0a1f14] transition-all cursor-pointer shadow-xs inline-flex items-center gap-2"
+            >
+              <IconPlay />
+              Iniciar Primera Indexación
+            </button>
+          </div>
+        ) : (
+          <div className="rounded-xl bg-white border border-slate-200 shadow-xs">
+            <div className="px-6 py-4 flex items-center justify-between gap-4 border-b border-slate-100 flex-wrap">
+              <div>
+                <div className="text-xs font-bold text-slate-900 tracking-wider">
+                  DOCUMENTOS EXTRAÍDOS DE LA FOTO ({activeSnapshot ? activeSnapshot.id : "—"})
+                </div>
+                <div className="text-xs mt-0.5 text-slate-500">
+                  Mostrando {filteredDocs.length} de {activeDocs.length} documentos.
+                </div>
               </div>
-              <div className="text-xs mt-0.5 text-slate-500">
-                Mostrando {filteredDocs.length} de {activeDocs.length} documentos.
+
+              {/* Filter input */}
+              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-xs min-w-[280px]">
+                <span className="text-slate-400">
+                  <IconSearch />
+                </span>
+                <input
+                  value={querySearch}
+                  onChange={(e) => setQuerySearch(e.target.value)}
+                  placeholder="Filtrar por título, url o descripción..."
+                  className="flex-1 bg-transparent text-xs focus:outline-none text-slate-700"
+                />
+                {querySearch && (
+                  <button onClick={() => setQuerySearch("")} className="text-slate-400 hover:text-slate-600 cursor-pointer">
+                    <IconClose />
+                  </button>
+                )}
               </div>
             </div>
 
-            {/* Filter input */}
-            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-xs min-w-[280px]">
-              <span className="text-slate-400">
-                <IconSearch />
-              </span>
-              <input
-                value={querySearch}
-                onChange={(e) => setQuerySearch(e.target.value)}
-                placeholder="Filtrar por título, url o descripción..."
-                className="flex-1 bg-transparent text-xs focus:outline-none text-slate-700"
-              />
-              {querySearch && (
-                <button onClick={() => setQuerySearch("")} className="text-slate-400 hover:text-slate-600 cursor-pointer">
-                  <IconClose />
-                </button>
+            {/* Cards Grid */}
+            <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredDocs.map((doc) => (
+                <DocumentCard key={doc.id} document={doc} siteId={site._id} />
+              ))}
+
+              {filteredDocs.length === 0 && (
+                <div className="col-span-full py-16 text-center text-slate-400 text-xs">
+                  {activeDocs.length === 0
+                    ? "Esta foto no tiene documentos extraídos asociados."
+                    : `Sin documentos que coincidan con "${querySearch}".`}
+                </div>
               )}
             </div>
           </div>
+        )}
 
-          {/* Cards Grid */}
-          <div className="p-6 grid grid-cols-3 gap-4">
-            {filteredDocs.map((doc) => (
-              <DocumentCard key={doc.id} document={doc} siteId={site._id} />
-            ))}
-
-            {filteredDocs.length === 0 && (
-              <div className="col-span-3 py-16 text-center text-slate-400 text-xs">
-                {activeDocs.length === 0
-                  ? "Esta foto no tiene documentos extraídos asociados."
-                  : `Sin documentos que coincidan con "${querySearch}".`}
-              </div>
-            )}
-          </div>
-        </div>
 
       </div>
 

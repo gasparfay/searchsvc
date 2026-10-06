@@ -299,10 +299,15 @@ export default function ConfigPage() {
                 <div className="text-xs text-slate-500 font-mono">auth0Id: {account.auth0Id || "Sin vincular"}</div>
               </div>
             </div>
-            <span className="text-xs text-emerald-800 bg-emerald-100 border border-emerald-200 px-2.5 py-1 rounded-full font-medium inline-flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              Vinculado con Google
+            <span className={`text-xs px-2.5 py-1 rounded-full font-medium inline-flex items-center gap-1.5 ${
+              account.auth0Id
+                ? "text-emerald-800 bg-emerald-100 border border-emerald-200"
+                : "text-slate-600 bg-slate-100 border border-slate-200"
+            }`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${account.auth0Id ? "bg-emerald-500" : "bg-slate-400"}`} />
+              {account.auth0Id ? "Vinculado con Google" : "Sin vincular a SSO"}
             </span>
+
           </div>
 
           <div className="px-6 py-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-end">
