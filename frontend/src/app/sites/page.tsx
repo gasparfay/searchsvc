@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { useApp } from "@/context/AppContext";
+import PageContainer from "@/components/PageContainer";
 import PageHeader from "@/components/PageHeader";
 import StatCard from "@/components/StatCard";
 import { Button } from "@/components/ui/button";
@@ -40,10 +41,8 @@ export default function SitesPage() {
   }, [sites, searchQuery, sortBy]);
 
   return (
-    <div className="h-full overflow-y-auto" style={{ background: "#f0f2f6" }}>
-      <div className="px-10 py-8">
-
-        {/* Page Header Component */}
+    <PageContainer>
+      {/* Page Header Component */}
         <PageHeader
           breadcrumb="MIS SITIOS / RESUMEN"
           title="Sitios Registrados"
@@ -90,8 +89,6 @@ export default function SitesPage() {
           onRequestDelete={setSiteToDelete}
         />
 
-      </div>
-
       {/* Delete confirmation modal */}
       <ConfirmModal
         isOpen={Boolean(siteToDelete)}
@@ -112,7 +109,6 @@ export default function SitesPage() {
         onConfirm={() => setSiteToDelete(null)}
         onCancel={() => setSiteToDelete(null)}
       />
-
-    </div>
+    </PageContainer>
   );
 }

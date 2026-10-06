@@ -3,6 +3,7 @@
 import { use } from "react";
 import Link from "next/link";
 import { useApp } from "@/context/AppContext";
+import PageContainer from "@/components/PageContainer";
 import PageHeader from "@/components/PageHeader";
 import { SiteForm } from "@/components/SiteForm";
 
@@ -20,7 +21,7 @@ export default function EditSitePage({
     url: "https://example.com",
     maxDepth: 2,
     frequency: "Cada 6 horas",
-    extractorSnippet: `function extract(request, response) {\n  const $ = response.body;\n  return [{\n    name: $('title').text(),\n    url: request.url,\n    description: $('meta[name="description"]').attr('content') || $('p').first().text().slice(0, 200)\n  }];\n}`,
+    extractorSnippet: `function extract(request, response) {\n  const $ = response.body;\n  return [{\n    name: $('title').text(),\n    url: request.url,\n    description: $('meta[name=\"description\"]').attr('content') || $('p').first().text().slice(0, 200)\n  }];\n}`,
     pageResolverSnippet: `function pageResolver(request, response) {\n  const $ = response.body;\n  const links = [];\n  $('a[href]').each(function() {\n    const href = $(this).attr('href');\n    if (href && href.startsWith('/')) links.push(request.baseUrl + href);\n  });\n  return links;\n}`,
     docsCount: 0,
     lastRunDate: "Sin ejecuciones",
@@ -30,33 +31,31 @@ export default function EditSitePage({
   };
 
   return (
-    <div className="h-full overflow-y-auto bg-slate-100">
-      <div className="px-10 py-8 max-w-5xl mx-auto">
-        {/* Page Header Component */}
-        <PageHeader
-          breadcrumb="MIS SITIOS / EDITAR CONFIGURACIÓN"
-          title={`Editar ${site.name}`}
-          subtitle={<span className="font-mono">ID: {site._id}</span>}
-          action={
-            <Link
-              href={`/sites/${id}`}
-              className="text-xs text-slate-400 hover:text-slate-600 transition-colors"
-            >
-              ← Cancelar
-            </Link>
-          }
-        />
+    <PageContainer maxWidth="5xl">
+      {/* Page Header Component */}
+      <PageHeader
+        breadcrumb="MIS SITIOS / EDITAR CONFIGURACIÓN"
+        title={`Editar ${site.name}`}
+        subtitle={<span className="font-mono">ID: {site._id}</span>}
+        action={
+          <Link
+            href={`/sites/${id}`}
+            className="text-xs text-slate-400 hover:text-slate-600 transition-colors"
+          >
+            ← Cancelar
+          </Link>
+        }
+      />
 
-        {/* Site Form Component */}
-        <SiteForm
-          initialData={site}
-          submitLabel="Guardar Cambios →"
-          cancelHref={`/sites/${id}`}
-          onSubmit={() => {
-            // Modo maquetado: el botón no realiza acción
-          }}
-        />
-      </div>
-    </div>
+      {/* Site Form Component */}
+      <SiteForm
+        initialData={site}
+        submitLabel="Guardar Cambios →"
+        cancelHref={`/sites/${id}`}
+        onSubmit={() => {
+          // Modo maquetado: el botón no realiza acción
+        }}
+      />
+    </PageContainer>
   );
 }

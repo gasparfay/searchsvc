@@ -16,6 +16,7 @@ import DocNavigation from "@/components/DocNavigation";
 import ExternalLink from "@/components/ExternalLink";
 import CodeBlock from "@/components/CodeBlock";
 import MetadataGrid from "@/components/MetadataGrid";
+import PageContainer from "@/components/PageContainer";
 
 export default function DocumentDetailPage({
   params,
@@ -30,7 +31,7 @@ export default function DocumentDetailPage({
 
   if (!document) {
     return (
-      <div className="h-full flex items-center justify-center p-8 bg-slate-100">
+      <PageContainer className="flex items-center justify-center min-h-[400px]">
         <EmptyState
           title="Documento no encontrado"
           description={`No se encontró ningún documento con el ID ${docId}.`}
@@ -43,7 +44,7 @@ export default function DocumentDetailPage({
             </Link>
           }
         />
-      </div>
+      </PageContainer>
     );
   }
 
@@ -55,86 +56,84 @@ export default function DocumentDetailPage({
   const nextDoc = currentIndex < snapshotDocs.length - 1 ? snapshotDocs[currentIndex + 1] : null;
 
   return (
-    <div className="h-full overflow-y-auto bg-slate-100">
-      <div className="px-10 py-8 max-w-5xl mx-auto">
-        {/* Navigation Bar */}
-        <DocNavigation
-          backHref={`/sites/${siteId}`}
-          backLabel={`Volver a ${site?.name || "Mis Sitios"}`}
-          prevHref={prevDoc ? `/sites/${siteId}/docs/${prevDoc.id}` : undefined}
-          nextHref={nextDoc ? `/sites/${siteId}/docs/${nextDoc.id}` : undefined}
-        />
+    <PageContainer maxWidth="5xl">
+      {/* Navigation Bar */}
+      <DocNavigation
+        backHref={`/sites/${siteId}`}
+        backLabel={`Volver a ${site?.name || "Mis Sitios"}`}
+        prevHref={prevDoc ? `/sites/${siteId}/docs/${prevDoc.id}` : undefined}
+        nextHref={nextDoc ? `/sites/${siteId}/docs/${nextDoc.id}` : undefined}
+      />
 
-        {/* Main Document Card */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2.5 mb-1.5 flex-wrap">
-              <Badge variant="success">
-                HTTP {document.httpStatus || 200} OK
-              </Badge>
-              <span className="text-xs text-slate-400 font-mono">
-                Doc ID: {document.id}
-              </span>
-              <span className="text-slate-300">·</span>
-              <span className="text-xs text-slate-500 font-mono">
-                Snapshot: {document.snapshotId}
-              </span>
-            </div>
-
-            <CardTitle>{document.name}</CardTitle>
-
-            <div className="mt-1">
-              <ExternalLink href={document.url} />
-            </div>
-          </CardHeader>
-
-          <CardContent>
-            {/* Description */}
-            <div>
-              <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                Descripción Extraída (OG / Meta / Párrafo)
-              </h2>
-              <div className="text-sm text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-lg border border-slate-100">
-                {document.description || "Sin descripción extraída para este documento."}
-              </div>
-            </div>
-
-            {/* Indexed Content */}
-            <CodeBlock
-              title="Contenido de Texto Indexado"
-              content={document.content}
-            />
-
-            {/* Metadata Grid */}
-            <MetadataGrid
-              title="Metadatos del Documento y Rastreo"
-              items={[
-                { label: "Sitio Asociado", value: site?.name },
-                {
-                  label: "Fecha de Captura",
-                  value: <span className="font-mono">{document.crawledAt}</span>,
-                },
-                {
-                  label: "Snapshot",
-                  value: <span className="font-mono text-emerald-700">{document.snapshotId}</span>,
-                },
-              ]}
-            />
-          </CardContent>
-
-          <CardFooter>
-            <Link
-              href={`/sites/${siteId}`}
-              className="text-xs font-semibold text-slate-600 hover:text-slate-900"
-            >
-              ← Volver a la lista de documentos
-            </Link>
+      {/* Main Document Card */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2.5 mb-1.5 flex-wrap">
+            <Badge variant="success">
+              HTTP {document.httpStatus || 200} OK
+            </Badge>
             <span className="text-xs text-slate-400 font-mono">
-              Documento {currentIndex + 1} de {snapshotDocs.length} en este snapshot
+              Doc ID: {document.id}
             </span>
-          </CardFooter>
-        </Card>
-      </div>
-    </div>
+            <span className="text-slate-300">·</span>
+            <span className="text-xs text-slate-500 font-mono">
+              Snapshot: {document.snapshotId}
+            </span>
+          </div>
+
+          <CardTitle>{document.name}</CardTitle>
+
+          <div className="mt-1">
+            <ExternalLink href={document.url} />
+          </div>
+        </CardHeader>
+
+        <CardContent>
+          {/* Description */}
+          <div>
+            <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+              Descripción Extraída (OG / Meta / Párrafo)
+            </h2>
+            <div className="text-sm text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-lg border border-slate-100">
+              {document.description || "Sin descripción extraída para este documento."}
+            </div>
+          </div>
+
+          {/* Indexed Content */}
+          <CodeBlock
+            title="Contenido de Texto Indexado"
+            content={document.content}
+          />
+
+          {/* Metadata Grid */}
+          <MetadataGrid
+            title="Metadatos del Documento y Rastreo"
+            items={[
+              { label: "Sitio Asociado", value: site?.name },
+              {
+                label: "Fecha de Captura",
+                value: <span className="font-mono">{document.crawledAt}</span>,
+              },
+              {
+                label: "Snapshot",
+                value: <span className="font-mono text-emerald-700">{document.snapshotId}</span>,
+              },
+            ]}
+          />
+        </CardContent>
+
+        <CardFooter>
+          <Link
+            href={`/sites/${siteId}`}
+            className="text-xs font-semibold text-slate-600 hover:text-slate-900"
+          >
+            ← Volver a la lista de documentos
+          </Link>
+          <span className="text-xs text-slate-400 font-mono">
+            Documento {currentIndex + 1} de {snapshotDocs.length} en este snapshot
+          </span>
+        </CardFooter>
+      </Card>
+    </PageContainer>
   );
 }
