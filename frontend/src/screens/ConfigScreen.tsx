@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useApp } from "@/context/AppContext";
 
 export default function ConfigScreen() {
@@ -142,19 +143,27 @@ export default function ConfigScreen() {
 
           {/* Ejemplo de cURL */}
           <div className="px-6 py-3.5 bg-slate-950/60 border-t border-slate-900 text-xs font-mono text-slate-400">
-            <div className="flex items-center justify-between mb-1.5">
+            <div className="flex items-center justify-between mb-1.5 flex-wrap gap-2">
               <span className="text-[11px] text-slate-400">Ejemplo de consumo del endpoint (Search Service Spec):</span>
-              <button
-                type="button"
-                onClick={copiarCurl}
-                className="text-[11px] text-slate-300 hover:text-white transition-colors inline-flex items-center gap-1 font-mono"
-              >
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
-                  <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="2"/>
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
-                {copiadoCurl ? "Copiado!" : "Copiar cURL"}
-              </button>
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/playground"
+                  className="text-[11px] text-emerald-400 hover:text-emerald-300 hover:underline transition-colors font-mono"
+                >
+                  Probar en Playground →
+                </Link>
+                <button
+                  type="button"
+                  onClick={copiarCurl}
+                  className="text-[11px] text-slate-300 hover:text-white transition-colors inline-flex items-center gap-1 font-mono"
+                >
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
+                    <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="2"/>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                  {copiadoCurl ? "Copiado!" : "Copiar cURL"}
+                </button>
+              </div>
             </div>
             <div className="text-slate-300 select-all overflow-x-auto py-1">
               curl -H &quot;Authorization: {account.apiKey}&quot; &quot;http://localhost:3000/search?q=palabra1+palabra2&quot;
