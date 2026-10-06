@@ -90,18 +90,10 @@ export default function ConfigScreen() {
 
           <div className="px-6 py-5 flex items-center justify-between gap-4">
             <div className="flex-1 min-w-0">
-              <div className="text-xs text-slate-400 mb-1 flex items-center gap-2">
-                <span>Clave de Autorización:</span>
-                <span className="text-[10px] text-slate-400 font-normal">(Haz clic sobre la clave para copiar)</span>
-              </div>
-              <button
-                type="button"
-                onClick={copiar}
-                title="Haz clic para copiar la API Key"
-                className="text-sm font-bold tracking-wider font-mono text-emerald-400 truncate text-left hover:text-emerald-300 transition-colors block w-full focus:outline-none"
-              >
+              <div className="text-xs text-slate-400 mb-1">Clave de Autorización:</div>
+              <div className="text-sm font-bold tracking-wider font-mono text-emerald-400 truncate select-all">
                 {account.apiKey}
-              </button>
+              </div>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <button
