@@ -1,15 +1,19 @@
 "use client";
 
-import { useState, useMemo, useEffect, use } from "react";
+import { useState, useMemo, use } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useApp } from "@/context/AppContext";
 import { IconTrash } from "@/components/icons";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import EmptyState from "@/components/EmptyState";
 import PageContainer from "@/components/PageContainer";
 import SiteHeader from "@/components/SiteHeader";
 import SnapshotBar from "@/components/SnapshotBar";
@@ -22,41 +26,27 @@ export default function SiteDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id: siteId } = use(params);
-  const { sites, snapshots, documents } = useApp();
+  const router = useRouter();
+  const { sites, snapshots, documents, deleteSite, triggerCrawl } = useApp();
 
-  const site = sites.find((s) => s._id === siteId) || sites[0] || {
-    _id: siteId || "65f1a2b3c4d5e6f7a8b9c011",
-    name: "Tienda Ejemplo",
-    url: "https://example.com",
-    maxDepth: 2,
-    frequency: "Cada 6 horas",
-    extractorSnippet: "",
-    pageResolverSnippet: "",
-    docsCount: 0,
-    lastRunDate: "Sin ejecuciones",
-    lastRunStatus: "ok" as const,
-    accountId: "65f1a2b3c4d5e6f7a8b9c001",
-    createdAt: new Date().toISOString(),
-  };
+  const site = sites.find((s) => s._id === siteId);
 
   const siteSnapshots = useMemo(() => {
     if (!site) return [];
     return snapshots.filter((snap) => snap.siteId === site._id);
   }, [snapshots, site]);
 
-  const [selectedSnapshotId, setSelectedSnapshotId] = useState<string>(() => {
-    return siteSnapshots[0]?.id || "";
-  });
-
-  useEffect(() => {
-    if (siteSnapshots.length > 0 && !siteSnapshots.some((s) => s.id === selectedSnapshotId)) {
-      setSelectedSnapshotId(siteSnapshots[0].id);
-    }
-  }, [siteSnapshots, selectedSnapshotId]);
+  const [userSelectedSnapshotId, setUserSelectedSnapshotId] = useState<string | null>(null);
 
   const activeSnapshot = useMemo(() => {
-    return siteSnapshots.find((s) => s.id === selectedSnapshotId) || siteSnapshots[0];
-  }, [siteSnapshots, selectedSnapshotId]);
+    if (!siteSnapshots.length) return undefined;
+    if (userSelectedSnapshotId && siteSnapshots.some((s) => s.id === userSelectedSnapshotId)) {
+      return siteSnapshots.find((s) => s.id === userSelectedSnapshotId);
+    }
+    return siteSnapshots[0];
+  }, [siteSnapshots, userSelectedSnapshotId]);
+
+  const selectedSnapshotId = activeSnapshot?.id || "";
 
   const [querySearch, setQuerySearch] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -79,8 +69,34 @@ export default function SiteDetailPage({
     );
   }, [activeDocs, querySearch]);
 
+  if (!site) {
+    return (
+      <PageContainer className="flex items-center justify-center min-h-[400px]">
+        <EmptyState
+          title="Sitio no encontrado"
+          description="El sitio que intentas consultar no existe o fue eliminado."
+          action={
+            <Link href="/sites">
+              <Button>← Volver a Mis Sitios</Button>
+            </Link>
+          }
+        />
+      </PageContainer>
+    );
+  }
+
   function handleTriggerCrawl() {
-    // Modo maquetado: el botón no realiza acción
+    if (site) {
+      triggerCrawl(site._id);
+    }
+  }
+
+  function handleDeleteSite() {
+    if (site) {
+      deleteSite(site._id);
+      setShowDeleteModal(false);
+      router.push("/sites");
+    }
   }
 
   return (
@@ -117,7 +133,7 @@ export default function SiteDetailPage({
           <SnapshotBar
             snapshots={siteSnapshots}
             activeSnapshotId={selectedSnapshotId}
-            onSelect={setSelectedSnapshotId}
+            onSelect={setUserSelectedSnapshotId}
           />
         </div>
       </Card>
@@ -151,7 +167,7 @@ export default function SiteDetailPage({
         confirmLabel="Sí, Eliminar Sitio"
         cancelLabel="Cancelar"
         confirmVariant="destructive"
-        onConfirm={() => setShowDeleteModal(false)}
+        onConfirm={handleDeleteSite}
         onCancel={() => setShowDeleteModal(false)}
       />
     </PageContainer>

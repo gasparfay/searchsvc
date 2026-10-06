@@ -27,10 +27,10 @@ export default function DocumentDetailPage({
   const { id: siteId, docId } = use(params);
   const { sites, documents } = useApp();
 
-  const site = sites.find((s) => s._id === siteId) || sites[0];
+  const site = sites.find((s) => s._id === siteId);
   const document = documents.find((d) => d.id === docId);
 
-  if (!document) {
+  if (!site || !document) {
     return (
       <PageContainer className="flex items-center justify-center min-h-[400px]">
         <EmptyState
@@ -38,10 +38,10 @@ export default function DocumentDetailPage({
           description={`No se encontró ningún documento con el ID ${docId}.`}
           action={
             <Link
-              href={`/sites/${siteId}`}
+              href={site ? `/sites/${site._id}` : "/sites"}
               className="text-xs text-emerald-600 font-bold hover:underline"
             >
-              Volver al Sitio
+              {site ? "Volver al Sitio" : "Volver a Mis Sitios"}
             </Link>
           }
         />

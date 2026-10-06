@@ -14,371 +14,11 @@ export const INITIAL_ACCOUNT: Account = {
   auth0Id: "google-oauth2|10928374651928374",
 };
 
-export const DEMO_SITES: Site[] = [
-  {
-    _id: "65f1a2b3c4d5e6f7a8b9c011",
-    accountId: "65f1a2b3c4d5e6f7a8b9c001",
-    name: "Tienda Ejemplo",
-    url: "https://example.com",
-    maxDepth: 2,
-    frequency: "Cada 6 horas",
-    docsCount: 1842,
-    lastRunDate: "Hoy, 09:12",
-    lastRunStatus: "ok",
-    extractorSnippet: `function extract(request, response) {\n  const $ = response.body;\n  return [{\n    name: $('title').text(),\n    url: request.url,\n    description: $('meta[name=\"description\"]').attr('content') || $('p').first().text().slice(0, 200)\n  }];\n}`,
-    pageResolverSnippet: `function pageResolver(request, response) {\n  const $ = response.body;\n  const links = [];\n  $('a[href]').each(function() {\n    const href = $(this).attr('href');\n    if (href && href.startsWith('/')) links.push(request.baseUrl + href);\n  });\n  return links;\n}`,
-  },
-  {
-    _id: "65f1a2b3c4d5e6f7a8b9c012",
-    accountId: "65f1a2b3c4d5e6f7a8b9c001",
-    name: "Blog Corporativo",
-    url: "https://techblog.acme.io",
-    maxDepth: 3,
-    frequency: "Cada 12 horas",
-    docsCount: 4391,
-    lastRunDate: "Hoy, 06:00",
-    lastRunStatus: "ok",
-    extractorSnippet: `function extract(request, response) {\n  const $ = response.body;\n  return [{\n    name: $('h1').first().text(),\n    url: request.url,\n    description: $('article p').first().text()\n  }];\n}`,
-  },
-  {
-    _id: "65f1a2b3c4d5e6f7a8b9c013",
-    accountId: "65f1a2b3c4d5e6f7a8b9c001",
-    name: "Wiki Interna",
-    url: "https://wiki.internal.acme.corp",
-    maxDepth: 2,
-    frequency: "Cada 12 horas",
-    docsCount: 3104,
-    lastRunDate: "Hoy, 08:50",
-    lastRunStatus: "ok",
-    extractorSnippet: `function extract(request, response) {\n  const $ = response.body;\n  return [{\n    name: $('title').text(),\n    url: request.url,\n    description: $('.wiki-content p').first().text()\n  }];\n}`,
-  },
-  {
-    _id: "65f1a2b3c4d5e6f7a8b9c014",
-    accountId: "65f1a2b3c4d5e6f7a8b9c001",
-    name: "Documentación Dev",
-    url: "https://docs.product.dev",
-    maxDepth: 3,
-    frequency: "Cada 24 horas",
-    docsCount: 782,
-    lastRunDate: "Ayer, 14:30",
-    lastRunStatus: "ok",
-    extractorSnippet: `function extract(request, response) {\n  const $ = response.body;\n  return [{\n    name: $('title').text(),\n    url: request.url,\n    description: $('main p').first().text()\n  }];\n}`,
-  },
-  {
-    _id: "65f1a2b3c4d5e6f7a8b9c015",
-    accountId: "65f1a2b3c4d5e6f7a8b9c001",
-    name: "Repositorio Legal",
-    url: "https://legal.acme.corp",
-    maxDepth: 2,
-    frequency: "Cada 48 horas",
-    docsCount: 229,
-    lastRunDate: "Hace 2 días",
-    lastRunStatus: "error",
-    extractorSnippet: `function extract(request, response) {\n  const $ = response.body;\n  return [{\n    name: $('title').text(),\n    url: request.url,\n    description: $('p').first().text()\n  }];\n}`,
-  },
-  {
-    _id: "65f1a2b3c4d5e6f7a8b9c016",
-    accountId: "65f1a2b3c4d5e6f7a8b9c001",
-    name: "Portal de Soporte",
-    url: "https://support.acme.corp",
-    maxDepth: 2,
-    frequency: "Cada 6 horas",
-    docsCount: 956,
-    lastRunDate: "Hoy, 07:45",
-    lastRunStatus: "ok",
-    extractorSnippet: `function extract(request, response) {\n  const $ = response.body;\n  return [{\n    name: $('title').text(),\n    url: request.url,\n    description: $('.faq-summary').text()\n  }];\n}`,
-  },
-];
-
-export const DEMO_SNAPSHOTS: CrawlSnapshot[] = [
-  {
-    id: "snap-019",
-    siteId: "65f1a2b3c4d5e6f7a8b9c011",
-    fecha: "04 sep 2026 · 09:12",
-    docs: 1842,
-    estado: "ok",
-    duracion: "21m 08s",
-    pagesVisited: 1842,
-  },
-  {
-    id: "snap-018",
-    siteId: "65f1a2b3c4d5e6f7a8b9c011",
-    fecha: "04 sep 2026 · 03:12",
-    docs: 1839,
-    estado: "ok",
-    duracion: "20m 44s",
-    pagesVisited: 1839,
-  },
-  {
-    id: "snap-017",
-    siteId: "65f1a2b3c4d5e6f7a8b9c011",
-    fecha: "03 sep 2026 · 21:12",
-    docs: 1835,
-    estado: "ok",
-    duracion: "22m 01s",
-    pagesVisited: 1835,
-  },
-  {
-    id: "snap-016",
-    siteId: "65f1a2b3c4d5e6f7a8b9c011",
-    fecha: "03 sep 2026 · 15:12",
-    docs: 1301,
-    estado: "parcial",
-    duracion: "14m 32s",
-    pagesVisited: 1500,
-  },
-  {
-    id: "snap-015",
-    siteId: "65f1a2b3c4d5e6f7a8b9c011",
-    fecha: "03 sep 2026 · 09:12",
-    docs: 1828,
-    estado: "ok",
-    duracion: "19m 55s",
-    pagesVisited: 1828,
-  },
-];
-
-export const DEMO_DOCUMENTS: ExtractedDocument[] = [
-  // Documentos de snap-019
-  {
-    id: "doc-001",
-    siteId: "65f1a2b3c4d5e6f7a8b9c011",
-    snapshotId: "snap-019",
-    name: "Página de Contacto y Canales de Atención",
-    url: "https://example.com/contacto",
-    description:
-      "Información de contacto, formularios de soporte directo y canales de atención al cliente corporativo disponibles 24/7.",
-    content:
-      "Horarios de atención: Lunes a Viernes de 9:00 a 18:00. Teléfono: +54 11 4321-0000. Email de soporte: soporte@example.com. Oficinas centrales en Ciudad Autónoma de Buenos Aires. Formulario de contacto directo habilitado para clientes enterprise.",
-    crawledAt: "2026-09-04 09:15:22",
-    httpStatus: 200,
-  },
-  {
-    id: "doc-002",
-    siteId: "65f1a2b3c4d5e6f7a8b9c011",
-    snapshotId: "snap-019",
-    name: "Catálogo Completo de Productos y Precios",
-    url: "https://example.com/productos",
-    description:
-      "Listado completo de productos disponibles con especificaciones técnicas, precios en USD y disponibilidad de stock en tiempo real.",
-    content:
-      "Explora nuestros artículos destacados en hardware, software e infraestructura de servidores. Todos los precios incluyen impuestos locales y garantía oficial de fábrica por 12 meses con soporte 24/7.",
-    crawledAt: "2026-09-04 09:17:40",
-    httpStatus: 200,
-  },
-  {
-    id: "doc-003",
-    siteId: "65f1a2b3c4d5e6f7a8b9c011",
-    snapshotId: "snap-019",
-    name: "Quiénes Somos — Nuestra Misión y Equipo",
-    url: "https://example.com/nosotros",
-    description:
-      "Historia de la empresa, misión, visión y el equipo detrás de la plataforma. Fundada en 2014 con foco en innovación tecnológica.",
-    content:
-      "Somos una compañía tecnológica comprometida con simplificar la gestión y búsqueda de información web. Nuestro equipo de ingenieros distribuidos trabaja para brindar herramientas de vanguardia a organizaciones de toda Latinoamérica.",
-    crawledAt: "2026-09-04 09:19:01",
-    httpStatus: 200,
-  },
-  {
-    id: "doc-004",
-    siteId: "65f1a2b3c4d5e6f7a8b9c011",
-    snapshotId: "snap-019",
-    name: "Preguntas Frecuentes (FAQ)",
-    url: "https://example.com/faq",
-    description:
-      "Respuestas a las consultas más comunes sobre compras, envíos, garantías, facturación y métodos de pago aceptados.",
-    content:
-      "¿Cómo rastreo mi pedido? Recibirás un enlace por correo con tu código de seguimiento en tiempo real. ¿Qué métodos de pago aceptan? Transferencias bancarias, tarjetas de crédito internacionales y billeteras virtuales.",
-    crawledAt: "2026-09-04 09:21:15",
-    httpStatus: 200,
-  },
-  {
-    id: "doc-005",
-    siteId: "65f1a2b3c4d5e6f7a8b9c011",
-    snapshotId: "snap-019",
-    name: "Política de Devoluciones y Reembolsos",
-    url: "https://example.com/devoluciones",
-    description:
-      "Procedimiento detallado para solicitar devoluciones, cambios y reembolsos. Plazo máximo de 30 días posteriores a la recepción.",
-    content:
-      "Condiciones de devolución: El producto debe encontrarse en su empaque original sin alteraciones físicas. Para iniciar el trámite, comunícate con soporte adjuntando el comprobante de compra original.",
-    crawledAt: "2026-09-04 09:23:50",
-    httpStatus: 200,
-  },
-  {
-    id: "doc-006",
-    siteId: "65f1a2b3c4d5e6f7a8b9c011",
-    snapshotId: "snap-019",
-    name: "Blog: Nuevas Actualizaciones de la Plataforma",
-    url: "https://example.com/blog",
-    description:
-      "Últimas noticias, anuncios de lanzamientos, guías técnicas y artículos de interés para nuestra comunidad de usuarios.",
-    content:
-      "Presentamos nuestro nuevo motor de indexación de texto completo con soporte para consultas semánticas y crawling asíncrono con Cheerio. Descubre todas las novedades y benchmarkings de rendimiento en este artículo.",
-    crawledAt: "2026-09-04 09:25:10",
-    httpStatus: 200,
-  },
-
-  // Documentos de snap-018
-  {
-    id: "doc-011",
-    siteId: "65f1a2b3c4d5e6f7a8b9c011",
-    snapshotId: "snap-018",
-    name: "Catálogo de Productos — Versión Nocturna",
-    url: "https://example.com/productos",
-    description:
-      "Captura de catálogo previa a la actualización de precios matutina.",
-    content:
-      "Inventario de productos y listas de precios vigentes al corte de las 03:00 AM.",
-    crawledAt: "2026-09-04 03:15:10",
-    httpStatus: 200,
-  },
-  {
-    id: "doc-012",
-    siteId: "65f1a2b3c4d5e6f7a8b9c011",
-    snapshotId: "snap-018",
-    name: "Términos y Condiciones del Servicio",
-    url: "https://example.com/terminos",
-    description:
-      "Marco legal para el uso de la plataforma de comercio electrónico.",
-    content:
-      "El uso de esta plataforma implica la aceptación íntegra de los términos y condiciones de servicio establecidos.",
-    crawledAt: "2026-09-04 03:18:22",
-    httpStatus: 200,
-  },
-
-  // Documentos de snap-017
-  {
-    id: "doc-021",
-    siteId: "65f1a2b3c4d5e6f7a8b9c011",
-    snapshotId: "snap-017",
-    name: "Página Principal (Home) — Edición Tarde",
-    url: "https://example.com/",
-    description:
-      "Banner promocional de fin de semana y artículos recomendados.",
-    content:
-      "Bienvenidos a Tienda Ejemplo. Encuentra las mejores soluciones tecnológicas para tu negocio.",
-    crawledAt: "2026-09-03 21:14:00",
-    httpStatus: 200,
-  },
-  {
-    id: "doc-022",
-    siteId: "65f1a2b3c4d5e6f7a8b9c011",
-    snapshotId: "snap-017",
-    name: "Soporte Técnico y Mesa de Ayuda",
-    url: "https://example.com/soporte",
-    description:
-      "Tickets de soporte y guías de configuración para clientes activos.",
-    content:
-      "Abre un ticket de ayuda o consulta los manuales en línea de nuestros productos.",
-    crawledAt: "2026-09-03 21:20:12",
-    httpStatus: 200,
-  },
-
-  // Documentos de snap-016
-  {
-    id: "doc-031",
-    siteId: "65f1a2b3c4d5e6f7a8b9c011",
-    snapshotId: "snap-016",
-    name: "Página de Contacto",
-    url: "https://example.com/contacto",
-    description: "Información de sucursales y puntos de retiro.",
-    content:
-      "Encuentra la sucursal más cercana para retiro inmediato de productos comprados en línea.",
-    crawledAt: "2026-09-03 15:15:30",
-    httpStatus: 200,
-  },
-
-  // Documentos de snap-015
-  {
-    id: "doc-041",
-    siteId: "65f1a2b3c4d5e6f7a8b9c011",
-    snapshotId: "snap-015",
-    name: "Catálogo Inicial de Lanzamiento",
-    url: "https://example.com/productos",
-    description:
-      "Versión archivada del catálogo al inicio del ciclo de rastreo.",
-    content:
-      "Listado de inventario inicial registrado en la primera corrida del día 03 de septiembre.",
-    crawledAt: "2026-09-03 09:14:11",
-    httpStatus: 200,
-  },
-];
-
-export const DEMO_JOBS: CrawlJob[] = [
-  {
-    id: "job-041",
-    siteId: "65f1a2b3c4d5e6f7a8b9c011",
-    sitio: "Tienda Ejemplo",
-    inicio: "Hoy · 09:12",
-    duracion: "21m 08s",
-    paginas: 1842,
-    docs: 1842,
-    errores: 0,
-    estado: "completado",
-  },
-  {
-    id: "job-040",
-    siteId: "65f1a2b3c4d5e6f7a8b9c013",
-    sitio: "Wiki Interna",
-    inicio: "Hoy · 08:50",
-    duracion: "18m 44s",
-    paginas: 3104,
-    docs: 3098,
-    errores: 0,
-    estado: "completado",
-  },
-  {
-    id: "job-039",
-    siteId: "65f1a2b3c4d5e6f7a8b9c012",
-    sitio: "Blog Corporativo",
-    inicio: "Hoy · 06:00",
-    duracion: "42m 11s",
-    paginas: 4391,
-    docs: 4391,
-    errores: 0,
-    estado: "completado",
-  },
-  {
-    id: "job-038",
-    siteId: "65f1a2b3c4d5e6f7a8b9c016",
-    sitio: "Portal de Soporte",
-    inicio: "Hoy · 07:45",
-    duracion: "9m 22s",
-    paginas: 956,
-    docs: 956,
-    errores: 0,
-    estado: "completado",
-  },
-  {
-    id: "job-037",
-    siteId: "65f1a2b3c4d5e6f7a8b9c015",
-    sitio: "Repositorio Legal",
-    inicio: "Hace 2 días",
-    duracion: "2m 03s",
-    paginas: 32,
-    docs: 28,
-    errores: 4,
-    estado: "error",
-  },
-  {
-    id: "job-036",
-    siteId: "65f1a2b3c4d5e6f7a8b9c014",
-    sitio: "Documentación Dev",
-    inicio: "Ayer · 14:30",
-    duracion: "9m 57s",
-    paginas: 782,
-    docs: 780,
-    errores: 1,
-    estado: "completado",
-  },
-];
-
-// Active runtime data: populated with demo mock data for schematic testing
-export const INITIAL_SITES: Site[] = DEMO_SITES;
-export const INITIAL_SNAPSHOTS: CrawlSnapshot[] = DEMO_SNAPSHOTS;
-export const INITIAL_DOCUMENTS: ExtractedDocument[] = DEMO_DOCUMENTS;
-export const INITIAL_JOBS: CrawlJob[] = DEMO_JOBS;
+// Initial state starts empty so the application initializes clean
+export const INITIAL_SITES: Site[] = [];
+export const INITIAL_SNAPSHOTS: CrawlSnapshot[] = [];
+export const INITIAL_DOCUMENTS: ExtractedDocument[] = [];
+export const INITIAL_JOBS: CrawlJob[] = [];
 
 // Aliases
 export const MOCK_ACCOUNT = INITIAL_ACCOUNT;
@@ -386,3 +26,189 @@ export const MOCK_SITES = INITIAL_SITES;
 export const MOCK_SNAPSHOTS = INITIAL_SNAPSHOTS;
 export const MOCK_DOCUMENTS = INITIAL_DOCUMENTS;
 export const MOCK_JOBS = INITIAL_JOBS;
+
+/**
+ * Generates sample snapshots, documents, and a completed job
+ * tailored to a newly registered site.
+ */
+export function createSampleCrawlData(site: { _id: string; name: string; url: string }) {
+  const cleanUrl = site.url.replace(/\/+$/, "");
+  const snap1Id = `snap-${Math.floor(100 + Math.random() * 900)}`;
+  const snap2Id = `snap-${Math.floor(100 + Math.random() * 900)}`;
+
+  const snapshots: CrawlSnapshot[] = [
+    {
+      id: snap1Id,
+      siteId: site._id,
+      fecha: "Hoy, recién",
+      docs: 4,
+      estado: "ok",
+      duracion: "1m 12s",
+      pagesVisited: 6,
+    },
+    {
+      id: snap2Id,
+      siteId: site._id,
+      fecha: "Ayer · 18:30",
+      docs: 2,
+      estado: "ok",
+      duracion: "0m 48s",
+      pagesVisited: 4,
+    },
+  ];
+
+  const docBase = Math.floor(100 + Math.random() * 800);
+  const documents: ExtractedDocument[] = [
+    {
+      id: `doc-${docBase}`,
+      siteId: site._id,
+      snapshotId: snap1Id,
+      name: `Portada Principal — ${site.name}`,
+      url: `${cleanUrl}/`,
+      description: `Página de inicio de ${site.name}. Información general y accesos principales.`,
+      content: `Bienvenido a ${site.name}. Explora las diferentes secciones y productos disponibles.`,
+      crawledAt: "Hoy, recién",
+      httpStatus: 200,
+    },
+    {
+      id: `doc-${docBase + 1}`,
+      siteId: site._id,
+      snapshotId: snap1Id,
+      name: `Catálogo de Productos y Servicios — ${site.name}`,
+      url: `${cleanUrl}/catalogo`,
+      description: `Listado completo de productos, inventario y especificaciones ofrecidas por ${site.name}.`,
+      content: `Catálogo general de ${site.name}. Artículos destacados, novedades y promociones activas.`,
+      crawledAt: "Hoy, recién",
+      httpStatus: 200,
+    },
+    {
+      id: `doc-${docBase + 2}`,
+      siteId: site._id,
+      snapshotId: snap1Id,
+      name: `Contacto y Atención al Cliente — ${site.name}`,
+      url: `${cleanUrl}/contacto`,
+      description: `Canales de atención, soporte técnico y formularios de comunicación directa.`,
+      content: `Centro de contacto de ${site.name}. Soporte técnico y atención al usuario disponibles.`,
+      crawledAt: "Hoy, recién",
+      httpStatus: 200,
+    },
+    {
+      id: `doc-${docBase + 3}`,
+      siteId: site._id,
+      snapshotId: snap1Id,
+      name: `Preguntas Frecuentes y Políticas — ${site.name}`,
+      url: `${cleanUrl}/faq`,
+      description: `Respuestas a dudas comunes, términos de servicio y políticas de privacidad.`,
+      content: `Preguntas frecuentes sobre envíos, garantías y condiciones del servicio en ${site.name}.`,
+      crawledAt: "Hoy, recién",
+      httpStatus: 200,
+    },
+    {
+      id: `doc-${docBase + 4}`,
+      siteId: site._id,
+      snapshotId: snap2Id,
+      name: `Portada Anterior — ${site.name}`,
+      url: `${cleanUrl}/`,
+      description: `Versión archivada de la portada en la corrida anterior del crawler.`,
+      content: `Registro histórico de la portada correspondiente al snapshot ${snap2Id}.`,
+      crawledAt: "Ayer · 18:30",
+      httpStatus: 200,
+    },
+    {
+      id: `doc-${docBase + 5}`,
+      siteId: site._id,
+      snapshotId: snap2Id,
+      name: `Productos (Histórico) — ${site.name}`,
+      url: `${cleanUrl}/catalogo`,
+      description: `Versión archivada del catálogo de la corrida anterior.`,
+      content: `Registro histórico de productos indexados previamente.`,
+      crawledAt: "Ayer · 18:30",
+      httpStatus: 200,
+    },
+  ];
+
+  const jobs: CrawlJob[] = [
+    {
+      id: `job-${Math.floor(100 + Math.random() * 900)}`,
+      siteId: site._id,
+      sitio: site.name,
+      inicio: "Hoy, recién",
+      duracion: "1m 12s",
+      paginas: 6,
+      docs: 4,
+      errores: 0,
+      estado: "completado",
+    },
+    {
+      id: `job-${Math.floor(100 + Math.random() * 900)}`,
+      siteId: site._id,
+      sitio: site.name,
+      inicio: "Ayer · 18:30",
+      duracion: "0m 48s",
+      paginas: 4,
+      docs: 2,
+      errores: 0,
+      estado: "completado",
+    },
+  ];
+
+  return { snapshots, documents, jobs };
+}
+
+/**
+ * Generates sample data for a manual crawl trigger in the UI.
+ */
+export function createMockCrawlRun(site: Site) {
+  const snapId = `snap-${Math.floor(100 + Math.random() * 900)}`;
+  const cleanUrl = site.url.replace(/\/+$/, "");
+
+  const newSnap: CrawlSnapshot = {
+    id: snapId,
+    siteId: site._id,
+    fecha: "Hoy, recién",
+    docs: 2,
+    estado: "ok",
+    duracion: "0m 35s",
+    pagesVisited: 5,
+  };
+
+  const docBase = Math.floor(100 + Math.random() * 800);
+  const newDocs: ExtractedDocument[] = [
+    {
+      id: `doc-${docBase}`,
+      siteId: site._id,
+      snapshotId: snapId,
+      name: `Novedades Indexadas — ${site.name}`,
+      url: `${cleanUrl}/novedades`,
+      description: `Contenido extraído durante la última ejecución del crawler en ${site.name}.`,
+      content: `Actualización de índice para ${site.name}. Nuevas secciones y páginas procesadas.`,
+      crawledAt: "Hoy, recién",
+      httpStatus: 200,
+    },
+    {
+      id: `doc-${docBase + 1}`,
+      siteId: site._id,
+      snapshotId: snapId,
+      name: `Artículos y Documentación — ${site.name}`,
+      url: `${cleanUrl}/docs`,
+      description: `Recursos y guías indexadas en la corrida reciente.`,
+      content: `Material y guías técnicas extraídas por los selectores Cheerio configurados.`,
+      crawledAt: "Hoy, recién",
+      httpStatus: 200,
+    },
+  ];
+
+  const newJob: CrawlJob = {
+    id: `job-${Math.floor(100 + Math.random() * 900)}`,
+    siteId: site._id,
+    sitio: site.name,
+    inicio: "Hoy, recién",
+    duracion: "0m 35s",
+    paginas: 5,
+    docs: 2,
+    errores: 0,
+    estado: "completado",
+  };
+
+  return { snapshot: newSnap, documents: newDocs, job: newJob };
+}

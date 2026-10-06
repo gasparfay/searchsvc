@@ -1,11 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useApp } from "@/context/AppContext";
 import PageContainer from "@/components/PageContainer";
 import PageHeader from "@/components/PageHeader";
 import { SiteForm } from "@/components/SiteForm";
 
 export default function NewSitePage() {
+  const router = useRouter();
+  const { addSite } = useApp();
+
   return (
     <PageContainer maxWidth="5xl">
       {/* Page Header Component */}
@@ -26,8 +31,9 @@ export default function NewSitePage() {
       <SiteForm
         submitLabel="Guardar y Registrar Sitio →"
         cancelHref="/sites"
-        onSubmit={() => {
-          // Modo maquetado: el botón no realiza acción
+        onSubmit={(values) => {
+          addSite(values);
+          router.push("/sites");
         }}
       />
     </PageContainer>

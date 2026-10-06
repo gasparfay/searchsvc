@@ -6,8 +6,6 @@ import { IconSites, IconEye, IconEdit, IconTrash } from "@/components/icons";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Select } from "@/components/ui/select";
 import {
   Table,
   TableHeader,
@@ -21,21 +19,15 @@ import SearchInput from "@/components/SearchInput";
 
 interface SiteTableProps {
   sites: Site[];
-  filteredSites: Site[];
   searchQuery: string;
   onSearchChange: (q: string) => void;
-  sortBy: "recent" | "name" | "docs";
-  onSortChange: (sort: "recent" | "name" | "docs") => void;
   onRequestDelete: (site: { id: string; name: string }) => void;
 }
 
 export default function SiteTable({
   sites,
-  filteredSites,
   searchQuery,
   onSearchChange,
-  sortBy,
-  onSortChange,
   onRequestDelete,
 }: SiteTableProps) {
   if (sites.length === 0) {
@@ -55,20 +47,16 @@ export default function SiteTable({
 
   return (
     <Card>
-      {/* Header bar with Search and Sort */}
+      {/* Header bar with Search */}
       <CardHeader className="flex-row items-center justify-between p-4 px-6 border-b border-slate-100 flex-wrap gap-4">
         <div className="flex items-center gap-3">
           <CardTitle className="text-xs uppercase tracking-wider">
-            LISTADO DE SITIOS ({filteredSites.length}
-            {filteredSites.length !== sites.length ? ` de ${sites.length}` : ""})
+            LISTADO DE SITIOS ({sites.length})
           </CardTitle>
-          <Badge variant="outline" className="font-mono text-[10px]">
-            MongoDB: sites
-          </Badge>
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">
-          {/* Reusable Search box */}
+          {/* Barra de búsqueda decorativa (sin filtrado activo) */}
           <SearchInput
             value={searchQuery}
             onChange={onSearchChange}
@@ -76,21 +64,6 @@ export default function SiteTable({
             className="w-56"
             inputClassName="font-mono"
           />
-
-          {/* Sort selector */}
-          <div className="flex items-center gap-2 text-xs text-slate-500">
-            <Label className="text-[11px] text-slate-400 font-normal">Ordenar:</Label>
-            <div className="w-36">
-              <Select
-                value={sortBy}
-                onChange={(e) => onSortChange(e.target.value as "recent" | "name" | "docs")}
-              >
-                <option value="recent">Recientes</option>
-                <option value="name">Nombre A-Z</option>
-                <option value="docs">Más Documentos</option>
-              </Select>
-            </div>
-          </div>
         </div>
       </CardHeader>
 
@@ -106,7 +79,7 @@ export default function SiteTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredSites.map((s) => {
+          {sites.map((s) => {
             const isOk = s.lastRunStatus === "ok";
 
             return (
@@ -178,30 +151,6 @@ export default function SiteTable({
               </TableRow>
             );
           })}
-
-          {filteredSites.length === 0 && (
-            <TableRow>
-              <TableCell colSpan={7} className="text-center py-12 text-sm text-slate-400">
-                {searchQuery ? (
-                  <div>
-                    <p className="mb-2">
-                      No se encontraron sitios que coincidan con &quot;
-                      <span className="text-slate-700 font-medium">{searchQuery}</span>&quot;
-                    </p>
-                    <Button
-                      variant="link"
-                      size="sm"
-                      onClick={() => onSearchChange("")}
-                    >
-                      Limpiar filtro de búsqueda
-                    </Button>
-                  </div>
-                ) : (
-                  "No tienes sitios registrados. Haz clic en '+ Registrar Nuevo Sitio' para comenzar."
-                )}
-              </TableCell>
-            </TableRow>
-          )}
         </TableBody>
       </Table>
     </Card>

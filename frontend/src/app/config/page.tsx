@@ -9,10 +9,11 @@ import AccountProfileCard from "@/components/AccountProfileCard";
 import ConfirmModal from "@/components/ConfirmModal";
 
 export default function ConfigPage() {
-  const { account } = useApp();
+  const { account, updateAccount, regenerateApiKey } = useApp();
   const [showRegenerateConfirm, setShowRegenerateConfirm] = useState(false);
 
   function handleRegenerar() {
+    regenerateApiKey();
     setShowRegenerateConfirm(false);
   }
 
@@ -42,7 +43,10 @@ export default function ConfigPage() {
       />
 
       {/* Panel 2: Perfil de Usuario */}
-      <AccountProfileCard account={account} />
+      <AccountProfileCard
+        account={account}
+        onSave={(name) => updateAccount({ name })}
+      />
     </PageContainer>
   );
 }

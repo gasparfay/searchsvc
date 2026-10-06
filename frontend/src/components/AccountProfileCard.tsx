@@ -45,9 +45,6 @@ export default function AccountProfileCard({ account, onSave }: AccountProfileCa
               Información general asociada al titular de la cuenta y sus accesos SSO.
             </CardDescription>
           </div>
-          <Badge variant="outline" className="font-mono text-xs">
-            ObjectId: {account._id}
-          </Badge>
         </CardHeader>
 
         <CardContent className="p-6">
@@ -66,14 +63,9 @@ export default function AccountProfileCard({ account, onSave }: AccountProfileCa
               />
             </div>
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="accountEmailInput" className="text-slate-600">
-                  EMAIL REGISTRADO
-                </Label>
-                <Badge variant="secondary" className="text-[10px] font-mono px-2 py-0.5">
-                  No editable (SSO)
-                </Badge>
-              </div>
+              <Label htmlFor="accountEmailInput" className="text-slate-600">
+                EMAIL REGISTRADO
+              </Label>
               <Input
                 id="accountEmailInput"
                 type="email"

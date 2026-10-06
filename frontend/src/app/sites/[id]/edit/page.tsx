@@ -2,10 +2,13 @@
 
 import { use } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useApp } from "@/context/AppContext";
 import PageContainer from "@/components/PageContainer";
 import PageHeader from "@/components/PageHeader";
 import { SiteForm } from "@/components/SiteForm";
+import EmptyState from "@/components/EmptyState";
+import { Button } from "@/components/ui/button";
 
 export default function EditSitePage({
   params,
@@ -13,22 +16,26 @@ export default function EditSitePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const { sites } = useApp();
+  const router = useRouter();
+  const { sites, updateSite } = useApp();
 
-  const site = sites.find((s) => s._id === id) || {
-    _id: id || "65f1a2b3c4d5e6f7a8b9c011",
-    name: "Tienda Ejemplo",
-    url: "https://example.com",
-    maxDepth: 2,
-    frequency: "Cada 6 horas",
-    extractorSnippet: `function extract(request, response) {\n  const $ = response.body;\n  return [{\n    name: $('title').text(),\n    url: request.url,\n    description: $('meta[name=\"description\"]').attr('content') || $('p').first().text().slice(0, 200)\n  }];\n}`,
-    pageResolverSnippet: `function pageResolver(request, response) {\n  const $ = response.body;\n  const links = [];\n  $('a[href]').each(function() {\n    const href = $(this).attr('href');\n    if (href && href.startsWith('/')) links.push(request.baseUrl + href);\n  });\n  return links;\n}`,
-    docsCount: 0,
-    lastRunDate: "Sin ejecuciones",
-    lastRunStatus: "ok" as const,
-    accountId: "65f1a2b3c4d5e6f7a8b9c001",
-    createdAt: new Date().toISOString(),
-  };
+  const site = sites.find((s) => s._id === id);
+
+  if (!site) {
+    return (
+      <PageContainer className="flex items-center justify-center min-h-[400px]">
+        <EmptyState
+          title="Sitio no encontrado"
+          description="El sitio que deseas editar no existe o fue eliminado."
+          action={
+            <Link href="/sites">
+              <Button>← Volver a Mis Sitios</Button>
+            </Link>
+          }
+        />
+      </PageContainer>
+    );
+  }
 
   return (
     <PageContainer maxWidth="5xl">
@@ -52,8 +59,9 @@ export default function EditSitePage({
         initialData={site}
         submitLabel="Guardar Cambios →"
         cancelHref={`/sites/${id}`}
-        onSubmit={() => {
-          // Modo maquetado: el botón no realiza acción
+        onSubmit={(values) => {
+          updateSite(site._id, values);
+          router.push(`/sites/${id}`);
         }}
       />
     </PageContainer>

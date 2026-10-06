@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useApp } from "@/context/AppContext";
 import PageContainer from "@/components/PageContainer";
@@ -12,29 +12,9 @@ import ConfirmModal from "@/components/ConfirmModal";
 import { IconTrash } from "@/components/icons";
 
 export default function SitesPage() {
-  const { sites, jobs } = useApp();
+  const { sites, jobs, deleteSite } = useApp();
   const [siteToDelete, setSiteToDelete] = useState<{ id: string; name: string } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState<"recent" | "name" | "docs">("recent");
-
-  const filteredSites = useMemo(() => {
-    let result = sites.filter((s) => {
-      if (!searchQuery.trim()) return true;
-      const q = searchQuery.toLowerCase();
-      return (
-        s.name.toLowerCase().includes(q) ||
-        s.url.toLowerCase().includes(q) ||
-        s._id.toLowerCase().includes(q)
-      );
-    });
-
-    if (sortBy === "docs") {
-      result = [...result].sort((a, b) => (b.docsCount || 0) - (a.docsCount || 0));
-    } else if (sortBy === "name") {
-      result = [...result].sort((a, b) => a.name.localeCompare(b.name));
-    }
-    return result;
-  }, [sites, searchQuery, sortBy]);
 
   return (
     <PageContainer>
@@ -55,11 +35,8 @@ export default function SitesPage() {
       {/* Sites Table */}
       <SiteTable
         sites={sites}
-        filteredSites={filteredSites}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        sortBy={sortBy}
-        onSortChange={setSortBy}
         onRequestDelete={setSiteToDelete}
       />
 
@@ -80,7 +57,12 @@ export default function SitesPage() {
         confirmLabel="Sí, Eliminar Sitio"
         cancelLabel="Cancelar"
         confirmVariant="destructive"
-        onConfirm={() => setSiteToDelete(null)}
+        onConfirm={() => {
+          if (siteToDelete) {
+            deleteSite(siteToDelete.id);
+            setSiteToDelete(null);
+          }
+        }}
         onCancel={() => setSiteToDelete(null)}
       />
     </PageContainer>
