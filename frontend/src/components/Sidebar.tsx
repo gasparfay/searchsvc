@@ -63,8 +63,9 @@ export default function Sidebar() {
           </div>
           <span className="text-base font-bold tracking-wider" style={{ color: "#e2e8f4" }}>SEARCHSVC</span>
         </Link>
-        <div className="text-xs" style={{ color: "#3ddc84", letterSpacing: "0.06em" }}>
-          ● SISTEMA ACTIVO
+        <div className="text-xs flex items-center gap-1.5" style={{ color: "#3ddc84", letterSpacing: "0.06em" }}>
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+          SISTEMA ACTIVO
         </div>
       </div>
 
@@ -100,18 +101,25 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* User */}
-      <div className="px-5 py-4" style={{ borderTop: "1px solid #1e2d42" }}>
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded flex items-center justify-center text-xs font-bold shrink-0"
+      {/* User profile card -> links to /config */}
+      <div className="px-3 py-3" style={{ borderTop: "1px solid #1e2d42" }}>
+        <Link
+          href="/config"
+          className="flex items-center gap-3 p-2 rounded-lg transition-all group hover:bg-slate-800/60"
+          title="Ver y configurar cuenta"
+          style={{
+            background: pathname === "/config" ? "rgba(61,220,132,0.08)" : "transparent",
+          }}
+        >
+          <div className="w-9 h-9 rounded flex items-center justify-center text-xs font-bold shrink-0 transition-transform group-hover:scale-105"
             style={{ background: "rgba(61,220,132,0.15)", color: "#3ddc84", border: "1px solid rgba(61,220,132,0.25)" }}>
             {initials}
           </div>
-          <div className="min-w-0">
-            <div className="text-sm font-medium truncate" style={{ color: "#c8d8ec" }}>{account.name}</div>
-            <div className="text-xs truncate" style={{ color: "#3a5570" }}>{account.email}</div>
+          <div className="min-w-0 flex-1">
+            <div className="text-sm font-medium truncate group-hover:text-emerald-400 transition-colors" style={{ color: "#c8d8ec" }}>{account.name}</div>
+            <div className="text-xs truncate" style={{ color: "#5a7a9a" }}>{account.email}</div>
           </div>
-        </div>
+        </Link>
       </div>
     </aside>
   );

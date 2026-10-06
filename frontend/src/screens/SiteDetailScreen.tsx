@@ -4,9 +4,52 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useApp } from "@/context/AppContext";
-import type { ExtractedDocument } from "@/types";
-import DocumentDetailModal from "@/components/DocumentDetailModal";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
+
+// Clean SVG Icons (no emojis)
+const IconArrowLeft = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+    <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+const IconPlay = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+    <polygon points="5 3 19 12 5 21 5 3"/>
+  </svg>
+);
+
+const IconEdit = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+const IconTrash = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+const IconSearch = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+    <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.8"/>
+    <line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+  </svg>
+);
+
+const IconCheck = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+    <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+const IconClose = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
 
 export default function SiteDetailScreen({ siteId }: { siteId: string }) {
   const router = useRouter();
@@ -23,12 +66,14 @@ export default function SiteDetailScreen({ siteId }: { siteId: string }) {
     return siteSnapshots[0]?.id || "";
   });
 
-  const activeSnapshot = siteSnapshots.find((s) => s.id === selectedSnapshotId) || siteSnapshots[0];
+  // Keep activeSnapshot in sync
+  const activeSnapshot = useMemo(() => {
+    return siteSnapshots.find((s) => s.id === selectedSnapshotId) || siteSnapshots[0];
+  }, [siteSnapshots, selectedSnapshotId]);
 
   const [querySearch, setQuerySearch] = useState("");
   const [isCrawling, setIsCrawling] = useState(false);
   const [crawlSuccessMessage, setCrawlSuccessMessage] = useState("");
-  const [selectedDoc, setSelectedDoc] = useState<ExtractedDocument | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // Documents for the currently active snapshot
@@ -55,7 +100,7 @@ export default function SiteDetailScreen({ siteId }: { siteId: string }) {
       <div className="h-full flex flex-col items-center justify-center p-8 text-center" style={{ background: "#f0f2f6" }}>
         <h2 className="text-lg font-bold text-slate-800 mb-2">Sitio no encontrado</h2>
         <Link href="/sites" className="text-xs text-emerald-600 font-bold hover:underline">
-          ← Volver a Mis Sitios
+          Volver a Mis Sitios
         </Link>
       </div>
     );
@@ -67,7 +112,7 @@ export default function SiteDetailScreen({ siteId }: { siteId: string }) {
       setCrawlSuccessMessage("");
       const newSnap = await triggerCrawl(site._id);
       setSelectedSnapshotId(newSnap.id);
-      setCrawlSuccessMessage(`¡Corrida completada con éxito! Se capturó una nueva foto (${newSnap.id}) con ${newSnap.docs} documentos.`);
+      setCrawlSuccessMessage(`Corrida completada con éxito. Se capturó una nueva foto (${newSnap.id}) con ${newSnap.docs} documentos.`);
       setTimeout(() => setCrawlSuccessMessage(""), 5000);
     } catch {
       // ignore
@@ -80,22 +125,21 @@ export default function SiteDetailScreen({ siteId }: { siteId: string }) {
     <div className="h-full overflow-y-auto" style={{ background: "#f0f2f6" }}>
       <div className="px-10 py-8">
 
-        {/* Header con migas de pan y acciones */}
+        {/* Header con navegación y acciones */}
         <div className="flex items-start justify-between mb-6">
           <div>
             <Link
               href="/sites"
-              className="text-xs mb-2 inline-flex items-center gap-1 transition-colors"
-              style={{ color: "#94a3b8" }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#475569")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "#94a3b8")}
+              className="text-xs mb-2 inline-flex items-center gap-1.5 transition-colors text-slate-400 hover:text-slate-700"
             >
-              ← Volver a Mis Sitios
+              <IconArrowLeft />
+              Volver a Mis Sitios
             </Link>
             <div className="flex items-center gap-3">
               <h1 className="text-2xl font-bold" style={{ color: "#0f172a" }}>{site.name}</h1>
-              <span className="text-xs px-2.5 py-1 rounded-full font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">
-                ● Programado: {site.frequency}
+              <span className="text-xs px-2.5 py-1 rounded-full font-medium bg-emerald-100 text-emerald-800 border border-emerald-200 inline-flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                Programado: {site.frequency}
               </span>
             </div>
             <div className="text-xs mt-1.5 font-mono text-slate-500 flex items-center gap-3">
@@ -107,7 +151,7 @@ export default function SiteDetailScreen({ siteId }: { siteId: string }) {
             </div>
           </div>
 
-          {/* Botones de acción del sitio */}
+          {/* Botones de acción del sitio (con iconos limpios SVG, sin emojis) */}
           <div className="flex items-center gap-3">
             {/* Ejecutar Crawl Ahora */}
             <button
@@ -133,9 +177,7 @@ export default function SiteDetailScreen({ siteId }: { siteId: string }) {
                 </>
               ) : (
                 <>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                    <polygon points="5 3 19 12 5 21 5 3"/>
-                  </svg>
+                  <IconPlay />
                   Ejecutar Crawl Ahora
                 </>
               )}
@@ -144,18 +186,20 @@ export default function SiteDetailScreen({ siteId }: { siteId: string }) {
             {/* Editar Configuración */}
             <Link
               href={`/sites/${site._id}/edit`}
-              className="px-4 py-2.5 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors shadow-xs"
+              className="flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors shadow-xs"
             >
-              ✏️ Editar Configuración
+              <IconEdit />
+              Editar Configuración
             </Link>
 
             {/* Eliminar Sitio */}
             <button
               type="button"
               onClick={() => setShowDeleteModal(true)}
-              className="px-3.5 py-2.5 text-xs font-semibold rounded-lg bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 transition-colors"
+              title="Eliminar sitio"
+              className="p-2.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 transition-colors"
             >
-              🗑️
+              <IconTrash />
             </button>
           </div>
         </div>
@@ -164,7 +208,9 @@ export default function SiteDetailScreen({ siteId }: { siteId: string }) {
         {crawlSuccessMessage && (
           <div className="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="font-bold text-emerald-700">✓</span>
+              <span className="text-emerald-700">
+                <IconCheck />
+              </span>
               <span>{crawlSuccessMessage}</span>
             </div>
             <button onClick={() => setCrawlSuccessMessage("")} className="text-emerald-700 font-bold hover:underline">
@@ -181,33 +227,33 @@ export default function SiteDetailScreen({ siteId }: { siteId: string }) {
                 FOTOS / SNAPSHOTS HISTÓRICOS DEL SITIO ({siteSnapshots.length})
               </div>
               <div className="text-xs mt-0.5 text-slate-500">
-                Seleccioná una foto para inspeccionar los documentos extraídos por el job en esa corrida.
+                Seleccioná una foto para navegar los documentos extraídos por el crawler en esa corrida.
               </div>
             </div>
             {activeSnapshot && (
               <span className="text-xs font-mono text-slate-500">
-                Foto activa: <strong className="text-slate-800">{activeSnapshot.id}</strong>
+                Foto activa: <strong className="text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">{activeSnapshot.id}</strong>
               </span>
             )}
           </div>
 
-          {/* Lista horizontal de Snapshots */}
+          {/* Lista horizontal interactiva de Snapshots */}
           <div className="p-4 overflow-x-auto">
             <div className="flex items-center gap-3">
               {siteSnapshots.map((snap) => {
-                const isSelected = (activeSnapshot?.id === snap.id);
+                const isSelected = activeSnapshot?.id === snap.id;
                 const isOk = snap.estado === "ok";
                 return (
                   <button
                     key={snap.id}
                     type="button"
                     onClick={() => setSelectedSnapshotId(snap.id)}
-                    className="flex-shrink-0 text-left p-3.5 rounded-lg border transition-all text-xs"
+                    className="flex-shrink-0 text-left p-3.5 rounded-lg border transition-all text-xs cursor-pointer"
                     style={{
-                      minWidth: "200px",
+                      minWidth: "210px",
                       background: isSelected ? "#f0fdf4" : "#f8fafc",
                       borderColor: isSelected ? "#3ddc84" : "#e2e8f0",
-                      boxShadow: isSelected ? "0 0 0 2px rgba(61,220,132,0.2)" : "none",
+                      boxShadow: isSelected ? "0 0 0 2px rgba(61,220,132,0.25)" : "none",
                     }}
                   >
                     <div className="flex items-center justify-between mb-1.5">
@@ -220,7 +266,7 @@ export default function SiteDetailScreen({ siteId }: { siteId: string }) {
                     </div>
                     <div className="text-slate-600 font-medium mb-1">{snap.fecha}</div>
                     <div className="flex items-center justify-between text-slate-400 text-[11px]">
-                      <span>{snap.docs.toLocaleString("es")} docs</span>
+                      <span>{snap.docs.toLocaleString("es")} documentos</span>
                       <span>{snap.duracion}</span>
                     </div>
                   </button>
@@ -244,17 +290,16 @@ export default function SiteDetailScreen({ siteId }: { siteId: string }) {
                 DOCUMENTOS EXTRAÍDOS DE LA FOTO ({activeSnapshot ? activeSnapshot.id : "—"})
               </div>
               <div className="text-xs mt-0.5 text-slate-500">
-                Mostrando {filteredDocs.length} de {activeDocs.length} documentos. Haz clic en cualquier tarjeta para ver el contenido completo.
+                Mostrando {filteredDocs.length} de {activeDocs.length} documentos. Haz clic en cualquier tarjeta para ver la pantalla de detalle.
               </div>
             </div>
 
             {/* Buscador de documentos */}
             <div className="flex items-center gap-2 px-3.5 py-2 rounded-lg"
               style={{ background: "#f8fafc", border: "1px solid #e2e8f0", minWidth: "300px" }}>
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <circle cx="6" cy="6" r="4" stroke="#94a3b8" strokeWidth="1.3"/>
-                <line x1="9.2" y1="9.2" x2="12.5" y2="12.5" stroke="#94a3b8" strokeWidth="1.3" strokeLinecap="round"/>
-              </svg>
+              <span className="text-slate-400">
+                <IconSearch />
+              </span>
               <input
                 value={querySearch}
                 onChange={(e) => setQuerySearch(e.target.value)}
@@ -262,7 +307,9 @@ export default function SiteDetailScreen({ siteId }: { siteId: string }) {
                 className="flex-1 bg-transparent text-xs focus:outline-none text-slate-700"
               />
               {querySearch && (
-                <button onClick={() => setQuerySearch("")} className="text-xs text-slate-400 hover:text-slate-600">✕</button>
+                <button onClick={() => setQuerySearch("")} className="text-xs text-slate-400 hover:text-slate-600">
+                  <IconClose />
+                </button>
               )}
             </div>
           </div>
@@ -270,10 +317,10 @@ export default function SiteDetailScreen({ siteId }: { siteId: string }) {
           {/* Grilla de Documentos */}
           <div className="p-6 grid grid-cols-3 gap-4">
             {filteredDocs.map((doc) => (
-              <div
+              <Link
                 key={doc.id}
-                onClick={() => setSelectedDoc(doc)}
-                className="rounded-lg p-4 transition-all cursor-pointer hover:shadow-xs group"
+                href={`/sites/${site._id}/docs/${doc.id}`}
+                className="rounded-lg p-4 transition-all block hover:shadow-xs group"
                 style={{ background: "#f8fafc", border: "1px solid #e2e8f0" }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.borderColor = "#3ddc84";
@@ -300,11 +347,11 @@ export default function SiteDetailScreen({ siteId }: { siteId: string }) {
                 </p>
                 <div className="mt-3 pt-2 border-t border-slate-200/60 flex items-center justify-between text-[11px] text-slate-400">
                   <span>{doc.crawledAt?.split(" ")[0]}</span>
-                  <span className="text-emerald-700 font-medium group-hover:underline">
+                  <span className="text-emerald-700 font-medium group-hover:underline inline-flex items-center gap-1">
                     Ver detalle →
                   </span>
                 </div>
-              </div>
+              </Link>
             ))}
 
             {filteredDocs.length === 0 && (
@@ -318,12 +365,6 @@ export default function SiteDetailScreen({ siteId }: { siteId: string }) {
         </div>
 
       </div>
-
-      {/* Modal de Detalle de Documento */}
-      <DocumentDetailModal
-        document={selectedDoc}
-        onClose={() => setSelectedDoc(null)}
-      />
 
       {/* Modal de confirmación para eliminar sitio */}
       <ConfirmDeleteModal

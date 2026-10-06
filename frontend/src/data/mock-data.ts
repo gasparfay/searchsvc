@@ -93,6 +93,7 @@ export const INITIAL_SNAPSHOTS: CrawlSnapshot[] = [
 ];
 
 export const INITIAL_DOCUMENTS: ExtractedDocument[] = [
+  // Documentos de snap-019
   {
     id: "doc-001",
     siteId: "65f1a2b3c4d5e6f7a8b9c011",
@@ -100,7 +101,7 @@ export const INITIAL_DOCUMENTS: ExtractedDocument[] = [
     name: "Página de Contacto y Canales de Atención",
     url: "https://example.com/contacto",
     description: "Información de contacto, formularios de soporte directo y canales de atención al cliente corporativo disponibles 24/7.",
-    content: "Horarios de atención: Lunes a Viernes de 9:00 a 18:00. Teléfono: +54 11 4321-0000. Email de soporte: soporte@example.com. Oficinas centrales en Ciudad Autónoma de Buenos Aires.",
+    content: "Horarios de atención: Lunes a Viernes de 9:00 a 18:00. Teléfono: +54 11 4321-0000. Email de soporte: soporte@example.com. Oficinas centrales en Ciudad Autónoma de Buenos Aires. Formulario de contacto directo habilitado para clientes enterprise.",
     crawledAt: "2026-09-04 09:15:22",
     httpStatus: 200,
   },
@@ -111,7 +112,7 @@ export const INITIAL_DOCUMENTS: ExtractedDocument[] = [
     name: "Catálogo Completo de Productos y Precios",
     url: "https://example.com/productos",
     description: "Listado completo de productos disponibles con especificaciones técnicas, precios en USD y disponibilidad de stock en tiempo real.",
-    content: "Explora nuestros artículos destacados en hardware, software e infraestructura de servidores. Todos los precios incluyen impuestos locales y garantía oficial de fábrica por 12 meses.",
+    content: "Explora nuestros artículos destacados en hardware, software e infraestructura de servidores. Todos los precios incluyen impuestos locales y garantía oficial de fábrica por 12 meses con soporte 24/7.",
     crawledAt: "2026-09-04 09:17:40",
     httpStatus: 200,
   },
@@ -122,7 +123,7 @@ export const INITIAL_DOCUMENTS: ExtractedDocument[] = [
     name: "Quiénes Somos — Nuestra Misión y Equipo",
     url: "https://example.com/nosotros",
     description: "Historia de la empresa, misión, visión y el equipo detrás de la plataforma. Fundada en 2014 con foco en innovación tecnológica.",
-    content: "Somos una compañía tecnológica comprometida con simplificar la gestión y búsqueda de información web. Nuestro equipo de ingenieros distribuidos trabaja para brindar herramientas de vanguardia.",
+    content: "Somos una compañía tecnológica comprometida con simplificar la gestión y búsqueda de información web. Nuestro equipo de ingenieros distribuidos trabaja para brindar herramientas de vanguardia a organizaciones de toda Latinoamérica.",
     crawledAt: "2026-09-04 09:19:01",
     httpStatus: 200,
   },
@@ -133,7 +134,7 @@ export const INITIAL_DOCUMENTS: ExtractedDocument[] = [
     name: "Preguntas Frecuentes (FAQ)",
     url: "https://example.com/faq",
     description: "Respuestas a las consultas más comunes sobre compras, envíos, garantías, facturación y métodos de pago aceptados.",
-    content: "¿Cómo rastreo mi pedido? Recibirás un enlace por correo con tu código de seguimiento. ¿Qué métodos de pago aceptan? Transferencias bancarias, tarjetas de crédito y billeteras virtuales.",
+    content: "¿Cómo rastreo mi pedido? Recibirás un enlace por correo con tu código de seguimiento en tiempo real. ¿Qué métodos de pago aceptan? Transferencias bancarias, tarjetas de crédito internacionales y billeteras virtuales.",
     crawledAt: "2026-09-04 09:21:15",
     httpStatus: 200,
   },
@@ -144,7 +145,7 @@ export const INITIAL_DOCUMENTS: ExtractedDocument[] = [
     name: "Política de Devoluciones y Reembolsos",
     url: "https://example.com/devoluciones",
     description: "Procedimiento detallado para solicitar devoluciones, cambios y reembolsos. Plazo máximo de 30 días posteriores a la recepción.",
-    content: "Condiciones de devolución: El producto debe encontrarse en su empaque original sin alteraciones. Para iniciar el trámite, comunícate con soporte adjuntando el comprobante de compra.",
+    content: "Condiciones de devolución: El producto debe encontrarse en su empaque original sin alteraciones físicas. Para iniciar el trámite, comunícate con soporte adjuntando el comprobante de compra original.",
     crawledAt: "2026-09-04 09:23:50",
     httpStatus: 200,
   },
@@ -155,8 +156,82 @@ export const INITIAL_DOCUMENTS: ExtractedDocument[] = [
     name: "Blog: Nuevas Actualizaciones de la Plataforma",
     url: "https://example.com/blog",
     description: "Últimas noticias, anuncios de lanzamientos, guías técnicas y artículos de interés para nuestra comunidad de usuarios.",
-    content: "Presentamos nuestro nuevo motor de indexación de texto completo con soporte para consultas semánticas y crawling asíncrono con Cheerio. Descubre todas las novedades en este artículo.",
+    content: "Presentamos nuestro nuevo motor de indexación de texto completo con soporte para consultas semánticas y crawling asíncrono con Cheerio. Descubre todas las novedades y benchmarkings de rendimiento en este artículo.",
     crawledAt: "2026-09-04 09:25:10",
+    httpStatus: 200,
+  },
+
+  // Documentos de snap-018
+  {
+    id: "doc-011",
+    siteId: "65f1a2b3c4d5e6f7a8b9c011",
+    snapshotId: "snap-018",
+    name: "Catálogo de Productos — Versión Nocturna",
+    url: "https://example.com/productos",
+    description: "Captura de catálogo previa a la actualización de precios matutina.",
+    content: "Inventario de productos y listas de precios vigentes al corte de las 03:00 AM.",
+    crawledAt: "2026-09-04 03:15:10",
+    httpStatus: 200,
+  },
+  {
+    id: "doc-012",
+    siteId: "65f1a2b3c4d5e6f7a8b9c011",
+    snapshotId: "snap-018",
+    name: "Términos y Condiciones del Servicio",
+    url: "https://example.com/terminos",
+    description: "Marco legal para el uso de la plataforma de comercio electrónico.",
+    content: "El uso de esta plataforma implica la aceptación íntegra de los términos y condiciones de servicio establecidos.",
+    crawledAt: "2026-09-04 03:18:22",
+    httpStatus: 200,
+  },
+
+  // Documentos de snap-017
+  {
+    id: "doc-021",
+    siteId: "65f1a2b3c4d5e6f7a8b9c011",
+    snapshotId: "snap-017",
+    name: "Página Principal (Home) — Edición Tarde",
+    url: "https://example.com/",
+    description: "Banner promocional de fin de semana y artículos recomendados.",
+    content: "Bienvenidos a Tienda Ejemplo. Encuentra las mejores soluciones tecnológicas para tu negocio.",
+    crawledAt: "2026-09-03 21:14:00",
+    httpStatus: 200,
+  },
+  {
+    id: "doc-022",
+    siteId: "65f1a2b3c4d5e6f7a8b9c011",
+    snapshotId: "snap-017",
+    name: "Soporte Técnico y Mesa de Ayuda",
+    url: "https://example.com/soporte",
+    description: "Tickets de soporte y guías de configuración para clientes activos.",
+    content: "Abre un ticket de ayuda o consulta los manuales en línea de nuestros productos.",
+    crawledAt: "2026-09-03 21:20:12",
+    httpStatus: 200,
+  },
+
+  // Documentos de snap-016
+  {
+    id: "doc-031",
+    siteId: "65f1a2b3c4d5e6f7a8b9c011",
+    snapshotId: "snap-016",
+    name: "Página de Contacto",
+    url: "https://example.com/contacto",
+    description: "Información de sucursales y puntos de retiro.",
+    content: "Encuentra la sucursal más cercana para retiro inmediato de productos comprados en línea.",
+    crawledAt: "2026-09-03 15:15:30",
+    httpStatus: 200,
+  },
+
+  // Documentos de snap-015
+  {
+    id: "doc-041",
+    siteId: "65f1a2b3c4d5e6f7a8b9c011",
+    snapshotId: "snap-015",
+    name: "Catálogo Inicial de Lanzamiento",
+    url: "https://example.com/productos",
+    description: "Versión archivada del catálogo al inicio del ciclo de rastreo.",
+    content: "Listado de inventario inicial registrado en la primera corrida del día 03 de septiembre.",
+    crawledAt: "2026-09-03 09:14:11",
     httpStatus: 200,
   },
 ];
